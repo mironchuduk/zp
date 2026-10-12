@@ -10,9 +10,9 @@ nav a{display:block;padding:10px 12px;border-radius:14px;color:var(--mut);cursor
 .set{margin-top:16px;padding:14px;background:rgba(255,255,255,.7);border-radius:20px;font-size:12px;color:var(--mut)}.set label{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
 .set input{width:70px;border:1px solid var(--line);border-radius:10px;padding:5px 8px;font:inherit;text-align:right}
 h2{font-size:26px;margin:0 0 14px;display:flex;gap:12px;align-items:center;justify-content:space-between}
-select{border:0;background:#fff;border-radius:14px;padding:8px 12px;font:inherit;box-shadow:0 2px 8px #0001}
+select{border:0;background:#fff;border-radius:14px;padding:8px 12px;font:500 14px "Onest",sans-serif;color:var(--ink);box-shadow:0 2px 8px #0001}
 .hero{border-radius:28px;padding:26px 32px;background:radial-gradient(300px 120px at 40% 20%,#dcebfb,transparent),radial-gradient(300px 160px at 100% 0,#dcd3fa,transparent),radial-gradient(300px 140px at 80% 110%,#f7dbe8,transparent),#fafbfd;box-shadow:0 4px 24px #0001}
-.cap{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}.hr{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:16px}.hs b{font:300 38px/1.1 "Onest",sans-serif;display:block}.hs small{display:block;color:var(--mut);font-size:12px;margin-top:6px}
+.cap{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}.hr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-top:16px}.hs b{font:300 clamp(22px,2.5vw,32px)/1.15 "Onest",sans-serif;display:block;white-space:nowrap}.hs small{white-space:nowrap}.hs small{display:block;color:var(--mut);font-size:12px;margin-top:6px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:14px 0}
 .card{background:#fafafc;border-radius:24px;padding:20px;box-shadow:0 2px 14px #0000000d}.card.big{padding:24px}
 .card .cap{display:flex;align-items:center;gap:8px}.ic{width:28px;height:28px;border-radius:9px;background:#eef;display:grid;place-items:center;font-size:13px;color:var(--ac);letter-spacing:0}
@@ -23,15 +23,15 @@ select{border:0;background:#fff;border-radius:14px;padding:8px 12px;font:inherit
 table{width:100%;border-collapse:collapse}th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);text-align:right;padding:8px}td{padding:12px 8px;text-align:right;border-top:1px solid var(--line)}th:first-child,td:first-child{text-align:left}tr.y{cursor:pointer}tr.y:hover td{background:#f1f0fb}
 svg text{font-size:11px;fill:#8a8d9b}.bar{transition:opacity .15s}.tip{position:fixed;background:#fff;border-radius:12px;padding:8px 12px;box-shadow:0 6px 24px #0003;pointer-events:none;font-size:12px;display:none;z-index:9}
 .leg span{cursor:pointer;margin-right:14px;font-size:12px}.err{padding:20px;background:#fdecea;border-radius:18px;color:#8a1c1c}
-@media(max-width:760px){.wrap{grid-template-columns:1fr;padding:16px 14px 90px;gap:16px}.logo,.set{display:none}nav{position:fixed;left:12px;right:12px;bottom:12px;display:flex;z-index:5}nav a{flex:1;text-align:center;padding:10px 4px}.hero{padding:20px}.hr{grid-template-columns:1fr 1fr}.hs b{font-size:28px}.cols{grid-template-columns:1fr}}
+@media(max-width:760px){.wrap{grid-template-columns:1fr;padding:16px 14px 90px;gap:16px}.logo,.set{display:none}nav{position:fixed;left:12px;right:12px;bottom:12px;display:flex;z-index:5}nav a{flex:1;text-align:center;padding:10px 4px}.hero{padding:20px}.hr{grid-template-columns:1fr 1fr}.hs b{font-size:26px}.hs small{white-space:normal}.cols{grid-template-columns:1fr}}
 </style></head><body><div class="tip" id="tip"></div>
 <div class="wrap"><aside><div class="logo">zp</div><nav id="nav"><a data-v="home">Главная</a><a data-v="cos">Компании</a><a data-v="years">Годы</a></nav>
-<div class="set">Настройки<label>Часов в месяц<input id="h" type="number" step="0.1"></label><label>Рабочих дней в месяц<input id="d" type="number" step="1"></label><label>Инфляция, %<input id="i" type="number" step="0.1"></label><div id="upd" style="margin-top:10px"></div></div></aside>
+<div class="set">Настройки<label>Часов в месяц<input id="h" type="number" step="0.1"></label><label>Дней в месяц<input id="d" type="number" step="1"></label><label>Инфляция в год, %<input id="i" type="number" step="0.1"></label><div id="upd" style="margin-top:10px"></div></div></aside>
 <main id="main"><div class="card">Загружаю данные…</div></main></div>
 <script src="calc.js"></script><script src="config.js"></script>
 <script>
 const $=s=>document.querySelector(s),COL=['#6c4de0','#3aa6e8','#f0a35e','#e4607a','#4fbf8f','#9aa0b4'],MN=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-const n0=x=>x==null?'—':Math.round(x).toLocaleString('ru-RU'),$$=x=>x==null?'—':n0(x)+' $',n2=x=>x==null?'—':x.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}),pc=x=>x==null?'—':(x>0?'+':'')+(x*100).toFixed(1).replace('.',',')+'%',gc=x=>x==null?'':x>0?'up':'dn';
+const n0=x=>x==null?'—':Math.round(x).toLocaleString('ru-RU'),$$=x=>x==null?'—':n0(x)+'\u00a0$',n2=x=>x==null?'—':x.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}),pc=x=>x==null?'—':(x>0?'+':'')+(x*100).toFixed(1).replace('.',',')+'%',gc=x=>x==null?'':x>0?'up':'dn';
 const mname=m=>MN[m.idx%12]+' '+Math.floor(m.idx/12),dt=d=>d.toLocaleDateString('ru-RU');
 let R,D,view='home',per='all',sel=null,hide=new Set(),ex=new Set(),st={h:+localStorage.h||168.7,i:+localStorage.i||3,d:+localStorage.d||21};
 $('#h').value=st.h;$('#i').value=st.i;$('#d').value=st.d;
@@ -40,7 +40,8 @@ $('#nav').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;draw()}};
 const card=(ic,l,v,s,c='')=>`<div class="card"><div class="cap"><span class="ic">${ic}</span>${l}</div><div class="v ${c}">${v}</div><div class="s">${s||''}</div></div>`;
 function calc(){D=Calc.compute(R,{hours:st.h,infl:st.i/100})}
 function range(){const M=D.M;if(per=='all')return M;if(per=='12')return M.slice(-12);return M.filter(m=>Math.floor(m.idx/12)==+per)}
-function chart(ms,vis,main,k0){const W=720,H=main?250:200,pl=42,pb=22,pt=10,tot=m=>m.s.reduce((a,v,k)=>a+(vis[k]?v+m.p[k]:0),0),mx=Math.max(1,...ms.map(tot))*1.1,bw=(W-pl)/ms.length,y=v=>pt+(H-pt-pb)*(1-v/mx);let g='';
+function nice(v){const e=Math.pow(10,Math.floor(Math.log10(v/4))),f=v/4/e;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e}
+function chart(ms,vis,main,k0){const W=720,H=main?250:200,pl=42,pb=22,pt=10,tot=m=>m.s.reduce((a,v,k)=>a+(vis[k]?v+m.p[k]:0),0),mx=nice(Math.max(1,...ms.map(tot))*1.02)*4,bw=(W-pl)/ms.length,y=v=>pt+(H-pt-pb)*(1-v/mx);let g='';
  for(let t=0;t<=4;t++){const v=mx*t/4;g+=`<line x1="${pl}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#e6e7ee"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${n0(v)}</text>`}
  ms.forEach((m,j)=>{const x=pl+j*bw;let a=0;D.C.forEach(c=>{if(!vis[c.k])return;[[m.s[c.k],1],[m.p[c.k],.4]].forEach(([v,o])=>{if(v>0){g+=`<rect class="bar" x="${x+bw*.15}" y="${y(a+v)}" width="${bw*.7}" height="${y(a)-y(a+v)}" fill="${COL[c.k%6]}" opacity="${o}" rx="2"/>`;a+=v}})});
   if(j%Math.ceil(ms.length/10)==0)g+=`<text x="${x+bw/2}" y="${H-5}" text-anchor="middle">${MN[m.idx%12]} ${String(Math.floor(m.idx/12)).slice(2)}</text>`;
@@ -52,13 +53,13 @@ function home(){const l=D.l12,A=D.all,dd=st.d,yrs=D.ys.map(s=>s.y),ms=range(),m=
  const o=`<option value="all">Всё время</option><option value="12">12 месяцев</option>`+yrs.slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('');
  const hs=(lab,v,al)=>`<div class="hs"><b>${v}</b><span class="cap">${lab}</span><small>${al}</small></div>`;
  return`<h2>Обзор<select id="per">${o}</select></h2>
- <div class="hero"><div class="cap">Последние 12 месяцев</div><div class="hr">${hs('в час',n2(l.hr)+' $','за всё время: '+n2(A.hr)+' $')}${hs('в день',$$(l.am/dd),'за всё время: '+$$(A.am/dd))}${hs('в месяц',$$(l.am),'за всё время: '+$$(A.am))}${hs('за год',$$(l.t),'всего за '+A.mo+' мес.: '+$$(A.t))}</div></div>
- <div class="grid">${card('∑','Всего',$$(A.t),'за '+A.mo+' мес. работы')}${card('$','Сейчас',$$(D.salNow),'в месяц, ставка '+n2(D.rateNow)+' $/ч')}${card('★','Долгострой',D.longest.name,D.longest.mo+' мес.')}${card('↑','Рекорд',$$(D.rec.tot),mname(D.rec))}${card('%','Рост 12 мес. (реал.)',pc(l.r),'номинально: '+pc(l.g),gc(l.r))}${card('↗','CAGR (реал.)',pc(D.cagrR),'номинально: '+pc(D.cagr)+', с '+(D.base?D.base.y:'—'),gc(D.cagrR))}</div>
+ <div class="hero"><div class="cap">Последние 12 месяцев</div><div class="hr">${hs('в час',n2(l.hr)+'\u00a0$','за всё время: '+n2(A.hr)+'\u00a0$')}${hs('в день',$$(l.am/dd),'за всё время: '+$$(A.am/dd))}${hs('в месяц',$$(l.am),'за всё время: '+$$(A.am))}${hs('за год',$$(l.t),'за всё время: '+$$(A.ay))}</div></div>
+ <div class="grid">${card('∑','Всего',$$(A.t),'за '+A.mo+' мес. работы')}${card('$','Сейчас',$$(D.salNow),'в месяц, ставка '+n2(D.rateNow)+' $/ч')}${card('★','Самый долгий стаж',D.longest.name,D.longest.mo+' мес.')}${card('↑','Рекорд',$$(D.rec.tot),mname(D.rec))}${card('%','Рост за 12 мес.',pc(l.r),'реальный, номинально '+pc(l.g),gc(l.r))}${card('↗','Рост в год (CAGR)',pc(D.cagrR),'реальный, номинально '+pc(D.cagr),gc(D.cagrR))}</div>
  <div class="card big"><div class="cap">Доход по месяцам</div><div class="leg" style="margin:8px 0">${D.C.map(c=>`<span data-k="${c.k}" style="opacity:${hide.has(c.k)?.4:1}"><i class="dot" style="background:${COL[c.k%6]}"></i>${c.name}</span>`).join('')}<span style="cursor:default"><i class="dot" style="background:#aaa;opacity:.5"></i>премии (светлее)</span></div>${chart(ms,D.C.map((_,k)=>!hide.has(k)),true)}
  <div class="s" id="det">${m?`<b>${mname(m)}:</b> ${D.C.map(c=>`${c.name} ${n0(m.s[c.k])}${m.p[c.k]>0?' + премия '+n0(m.p[c.k]):''}`).filter((t,k)=>m.s[k]||m.p[k]).join(' · ')} → <b>${$$(m.tot)}</b>`:'Нажмите на столбец, чтобы увидеть состав месяца. Пунктир это скользящее среднее за 12 мес.'}</div></div>`}
 function det(c){const sr=R.filter(r=>r.c==c.name&&!r.p).sort((a,b)=>a.s-b.s),pr=R.filter(r=>r.c==c.name&&r.p).sort((a,b)=>a.s-b.s),ix=d=>d.getFullYear()*12+d.getMonth(),
  ms=D.M.filter(m=>m.idx>=ix(c.from)&&m.idx<=(c.open?D.cur:ix(c.to)));
- return`<div class="det"><div class="grid" style="margin-top:0">${[['Месяцев',c.mo],['Зарплата',$$(c.sal)],['Премии',$$(c.pr)],['Доля дохода',(c.share*100).toFixed(1).replace('.',',')+'%'],['В день',$$(c.am/st.d)],['В час',n2(c.hr)+' $']].map(([l,v])=>`<div><div class="cap">${l}</div><div class="v" style="font-size:20px">${v}</div></div>`).join('')}</div>
+ return`<div class="det"><div class="grid" style="margin-top:0">${[['Месяцев',c.mo],['Зарплата',$$(c.sal)],['Премии',$$(c.pr)],['Доля дохода',(c.share*100).toFixed(1).replace('.',',')+'%'],['В день',$$(c.am/st.d)],['В час',n2(c.hr)+'\u00a0$']].map(([l,v])=>`<div><div class="cap">${l}</div><div class="v" style="font-size:20px">${v}</div></div>`).join('')}</div>
  ${chart(ms,D.C.map((_,k)=>k==c.k),false,c.k)}
  <div class="cols"><div><div class="cap">Зарплата по периодам</div><table>${sr.map((r,i)=>{const g=i&&sr[i-1].a>0?r.a/sr[i-1].a-1:null;return`<tr><td>${dt(r.s)} — ${r.e?dt(r.e):'н.в.'}</td><td>${$$(r.a)}</td><td class="${gc(g)}">${pc(g)}</td></tr>`}).join('')}</table></div>
  <div><div class="cap">Премии</div>${pr.length?`<table>${pr.map(r=>`<tr><td>${dt(r.s)}</td><td>${$$(r.a)}</td></tr>`).join('')}</table>`:'<div class="s" style="margin-top:10px">Премий не было</div>'}</div></div></div>`}
