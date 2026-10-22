@@ -1,2 +1,2 @@
 // Ссылка на опубликованный лист «Данные» (формат CSV). Чтобы сменить таблицу, поменяйте только эту строку.
-window.CFG = { csv: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQhioRdtYCJcPIq1kTNvUdrMhQYgI36VGZ7W1XvlKfRYaNwK-KK_VyT75JFpy7N93mTAJZcShdHn9Zz/pub?gid=1562418919&single=true&output=csv" };
+window.CFG = { csv: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQhioRdtYCJcPIq1kTNvUdrMhQYgI36VGZ7W1XvlKfRYaNwK-KK_VyT75JFpy7N93mTAJZcShdHn9Zz/pub?gid=956410162&single=true&output=csv" };
