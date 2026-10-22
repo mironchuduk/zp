@@ -14,9 +14,12 @@ function compute(R,o){
  const cv=cos.map(()=>new Uint8Array(T)),sal=cos.map(()=>Array(n).fill(0)),pr=cos.map(()=>Array(n).fill(0));
  // зарплата: пропорционально дням месяца, в которые человек числился в компании
  R.forEach(r=>{if(r.p)return;const k=cos.indexOf(r.c),a=Math.max(UD(r.s),fd),b=Math.min(r.e?UD(r.e):ed,ed);for(let d=a;d<=b;d++){cv[k][d-fd]=1;const i=dm[d-fd];sal[k][i]+=r.a/md[i]}});
- // премия: делится по дням работы в этой компании за год до даты премии (включая её день)
- R.forEach(r=>{if(!r.p)return;const k=cos.indexOf(r.c),P=UD(r.s);if(P>ed)return;const lo=Math.max(U(r.s.getFullYear()-1,r.s.getMonth(),r.s.getDate()+1),fd);let N=0;for(let d=lo;d<=P;d++)N+=cv[k][d-fd];
-  if(N){for(let d=lo;d<=P;d++)if(cv[k][d-fd])pr[k][dm[d-fd]]+=r.a/N}else if(P>=fd)pr[k][dm[P-fd]]+=r.a});
+ // премия: если указан период (Начало и Конец), делится по дням работы в этой компании внутри периода;
+ // если конца нет, как раньше: год до даты в «Начало»
+ R.forEach(r=>{if(!r.p)return;const k=cos.indexOf(r.c),P=UD(r.s),hasP=!!r.e;if(!hasP&&P>ed)return;
+  const a0=hasP?P:U(r.s.getFullYear()-1,r.s.getMonth(),r.s.getDate()+1),b0=hasP?UD(r.e):P,lo=Math.max(a0,fd),hi=Math.min(b0,ed);let N=0;
+  for(let d=lo;d<=hi;d++)N+=cv[k][d-fd];
+  if(N){for(let d=lo;d<=hi;d++)if(cv[k][d-fd])pr[k][dm[d-fd]]+=r.a/N}else pr[k][dm[Math.min(Math.max(b0,fd),ed)-fd]]+=r.a});
  const f=cos.map(()=>Array(n).fill(0)),an=Array(n).fill(0);
  for(let d=0;d<T;d++){let a=0;for(let k=0;k<K;k++)if(cv[k][d]){f[k][dm[d]]++;a=1}an[dm[d]]+=a}
  for(let i=0;i<n;i++){an[i]/=md[i];for(let k=0;k<K;k++)f[k][i]/=md[i]}

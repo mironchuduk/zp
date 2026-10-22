@@ -33,13 +33,13 @@ svg text{font-size:11px;fill:#8a8d9b}.bar{transition:opacity .15s}.tip{position:
 const $=s=>document.querySelector(s),COL=['#6c4de0','#3aa6e8','#f0a35e','#e4607a','#4fbf8f','#9aa0b4'],MN=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
 const n0=x=>x==null?'—':Math.round(x).toLocaleString('ru-RU'),$$=x=>x==null?'—':n0(x)+'\u00a0$',n2=x=>x==null?'—':x.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}),pc=x=>x==null?'—':(x>0?'+':'')+(x*100).toFixed(1).replace('.',',')+'%',gc=x=>x==null?'':x>0?'up':'dn';
 const fm=x=>String(Math.round(x*10)/10).replace('.',','),mname=m=>MN[m.idx%12]+' '+Math.floor(m.idx/12),dt=d=>d.toLocaleDateString('ru-RU');
-let R,D,view='home',per='all',sel=null,hide=new Set(),ex=new Set(),st={h:+localStorage.h||168.7,i:+localStorage.i||3,d:+localStorage.d||21};
+let R,D,view='home',per='12',sel=null,hide=new Set(),ex=new Set(),st={h:+localStorage.h||168.7,i:+localStorage.i||3,d:+localStorage.d||21};
 $('#h').value=st.h;$('#i').value=st.i;$('#d').value=st.d;
 ['h','i','d'].forEach(k=>$('#'+k).onchange=e=>{st[k]=+e.target.value;localStorage[k]=st[k];calc();draw()});
 $('#nav').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;draw()}};
 const card=(ic,l,v,s,c='')=>`<div class="card"><div class="cap"><span class="ic">${ic}</span>${l}</div><div class="v ${c}">${v}</div><div class="s">${s||''}</div></div>`;
 function calc(){D=Calc.compute(R,{hours:st.h,infl:st.i/100})}
-function range(){const M=D.M;if(per=='all')return M;if(per=='12')return M.slice(-12);return M.filter(m=>Math.floor(m.idx/12)==+per)}
+function range(){const M=D.M;if(per=='all')return M;if(per=='12'||per=='now')return M.slice(-12);return M.filter(m=>Math.floor(m.idx/12)==+per)}
 function nice(v){const e=Math.pow(10,Math.floor(Math.log10(v/4))),f=v/4/e;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e}
 function chart(ms,vis,main,k0){const W=720,H=main?250:200,pl=42,pb=22,pt=10,tot=m=>m.s.reduce((a,v,k)=>a+(vis[k]?v+m.p[k]:0),0),mx=nice(Math.max(1,...ms.map(tot))*1.02)*4,bw=(W-pl)/ms.length,y=v=>pt+(H-pt-pb)*(1-v/mx);let g='';
  for(let t=0;t<=4;t++){const v=mx*t/4;g+=`<line x1="${pl}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#e6e7ee"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${n0(v)}</text>`}
@@ -49,11 +49,12 @@ function chart(ms,vis,main,k0){const W=720,H=main?250:200,pl=42,pb=22,pt=10,tot=
   g+=`<rect ${main?`data-i="${m.i}"`:''} data-tip="${tp.replace(/"/g,'&quot;')}" x="${x}" y="0" width="${bw}" height="${H-pb}" fill="${main&&sel==m.i?'#6c4de022':'transparent'}"/>`});
  if(main&&!hide.size)g+=`<polyline fill="none" stroke="#1c1c24" stroke-width="2" stroke-dasharray="5 4" points="${ms.map((m,j)=>`${pl+j*bw+bw/2},${y(m.ma)}`).join(' ')}"/>`;
  return`<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`}
-function home(){const l=D.l12,A=D.all,dd=st.d,yrs=D.ys.map(s=>s.y),ms=range(),m=sel!=null?D.M[sel]:null;
- const o=`<option value="all">Всё время</option><option value="12">12 месяцев</option>`+yrs.slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('');
+function home(){const l=D.l12,A=D.all,dd=st.d,yrs=D.ys.map(s=>s.y),ms=range(),m=sel!=null?D.M[sel]:null,dv=x=>x==null?null:x/dd;
+ const o=[['now','Сейчас'],['12','Последние 12 месяцев'],['all','Всё время'],...yrs.slice().reverse().map(y=>[String(y),String(y)])].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+ const now=per=='now',S=now?{am:D.salNow,hr:D.rateNow,ay:D.salNow*12}:per=='12'?l:per=='all'?A:D.ys.find(s=>s.y==+per)||l;
  const hs=(lab,v,al)=>`<div class="hs"><b>${v}</b><span class="cap">${lab}</span><small>${al}</small></div>`;
- return`<h2>Обзор<select id="per">${o}</select></h2>
- <div class="hero"><div class="cap">Последние 12 месяцев</div><div class="hr">${hs('в час',n2(l.hr)+'\u00a0$','за всё время: '+n2(A.hr)+'\u00a0$')}${hs('в день',$$(l.am/dd),'за всё время: '+$$(A.am/dd))}${hs('в месяц',$$(l.am),'за всё время: '+$$(A.am))}${hs('за год',$$(l.t),'за всё время: '+$$(A.ay))}</div></div>
+ return`<h2>Обзор</h2>
+ <div class="hero"><div class="cap"><select id="per">${o}</select> <span style="margin-left:8px">${now?'по действующим ставкам, без премий':''}</span></div><div class="hr">${hs('в час',n2(S.hr)+'\u00a0$',now?'за 12 мес.: '+n2(l.hr):'сейчас: '+n2(D.rateNow))}${hs('в день',$$(dv(S.am)),now?'за 12 мес.: '+$$(dv(l.am)):'сейчас: '+$$(dv(D.salNow)))}${hs('в месяц',$$(S.am),now?'за 12 мес.: '+$$(l.am):'сейчас: '+$$(D.salNow))}${hs('в год',$$(S.ay),now?'за 12 мес.: '+$$(l.ay):'сейчас: '+$$(D.salNow*12))}</div></div>
  <div class="grid">${card('∑','Всего',$$(A.t),'за '+fm(A.mo)+' мес. работы')}${card('$','Сейчас',$$(D.salNow),'в месяц, ставка '+n2(D.rateNow)+' $/ч')}${card('★','Самый долгий стаж',D.longest.name,fm(D.longest.mo)+' мес.')}${card('↑','Рекорд',$$(D.rec.tot),mname(D.rec))}${card('%','Рост за 12 мес.',pc(l.r),'реальный, номинально '+pc(l.g),gc(l.r))}${card('↗','Рост в год (CAGR)',pc(D.cagrR),'реальный, номинально '+pc(D.cagr),gc(D.cagrR))}</div>
  <div class="card big"><div class="cap">Доход по месяцам</div><div class="leg" style="margin:8px 0">${D.C.map(c=>`<span data-k="${c.k}" style="opacity:${hide.has(c.k)?.4:1}"><i class="dot" style="background:${COL[c.k%6]}"></i>${c.name}</span>`).join('')}<span style="cursor:default"><i class="dot" style="background:#aaa;opacity:.5"></i>премии (светлее)</span></div>${chart(ms,D.C.map((_,k)=>!hide.has(k)),true)}
  <div class="s" id="det">${m?`<b>${mname(m)}:</b> ${D.C.map(c=>`${c.name} ${n0(m.s[c.k])}${m.p[c.k]>0?' + премия '+n0(m.p[c.k]):''}`).filter((t,k)=>m.s[k]||m.p[k]).join(' · ')} → <b>${$$(m.tot)}</b>`:'Нажмите на столбец, чтобы увидеть состав месяца. Пунктир это скользящее среднее за 12 мес.'}</div></div>`}
@@ -62,7 +63,7 @@ function det(c){const sr=R.filter(r=>r.c==c.name&&!r.p).sort((a,b)=>a.s-b.s),pr=
  return`<div class="det"><div class="grid" style="margin-top:0">${[['Месяцев',fm(c.mo)],['Зарплата',$$(c.sal)],['Премии',$$(c.pr)],['Доля дохода',(c.share*100).toFixed(1).replace('.',',')+'%'],['В день',$$(c.am/st.d)],['В час',n2(c.hr)+'\u00a0$']].map(([l,v])=>`<div><div class="cap">${l}</div><div class="v" style="font-size:20px">${v}</div></div>`).join('')}</div>
  ${chart(ms,D.C.map((_,k)=>k==c.k),false,c.k)}
  <div class="cols"><div><div class="cap">Зарплата по периодам</div><table>${sr.map((r,i)=>{const g=i&&sr[i-1].a>0?r.a/sr[i-1].a-1:null;return`<tr><td>${dt(r.s)} — ${r.e?dt(r.e):'н.в.'}</td><td>${$$(r.a)}</td><td class="${gc(g)}">${pc(g)}</td></tr>`}).join('')}</table></div>
- <div><div class="cap">Премии</div>${pr.length?`<table>${pr.map(r=>`<tr><td>${dt(r.s)}</td><td>${$$(r.a)}</td></tr>`).join('')}</table>`:'<div class="s" style="margin-top:10px">Премий не было</div>'}</div></div></div>`}
+ <div><div class="cap">Премии</div>${pr.length?`<table>${pr.map(r=>`<tr><td>${r.e?'за '+dt(r.s)+' — '+dt(r.e):dt(r.s)+' (за год до даты)'}</td><td>${$$(r.a)}</td></tr>`).join('')}</table>`:'<div class="s" style="margin-top:10px">Премий не было</div>'}</div></div></div>`}
 function cos(){return`<h2>Компании</h2><div class="grid">${D.C.map(c=>{const o=ex.has(c.k),col=COL[c.k%6];return`<div class="card co ${o?'open':''}" style="border-color:${col}55"><div class="ch" data-co="${c.k}"><div class="cap"><i class="dot" style="background:${col}"></i>${c.name}<span class="chev">${o?'▴':'▾'}</span></div><div class="v">${$$(c.t)}</div><div class="s">${dt(c.from)} — ${c.open?'н.в.':dt(c.to)} · ${fm(c.mo)} мес.<br>${(c.share*100).toFixed(1).replace('.',',')}% дохода · премии ${$$(c.pr)}</div><div class="s" style="margin-top:10px;color:var(--ink)">${$$(c.am)} в мес. · ${$$(c.ay)} в год · ${n2(c.hr)} $/ч</div></div>${o?det(c):''}</div>`}).join('')}</div><div class="s">Нажмите на компанию, чтобы развернуть подробности.</div>`}
 function years(){const l=D.l12,p=D.p12;return`<h2>Годы</h2><div class="grid">${card('%','12 мес. к предыдущим',pc(l.r),'номинально: '+pc(l.g),gc(l.r))}${card('Ø','Средний рост год к году',pc(D.avgR),'номинально: '+pc(D.avgG),gc(D.avgR))}${card('↗','CAGR',pc(D.cagrR),'номинально: '+pc(D.cagr),gc(D.cagrR))}</div>
  <div class="card big"><table><tr><th>Период</th><th>Мес.</th><th>Заработано</th><th>В месяц</th><th>В час</th><th>Рост</th><th>Реальный</th></tr>
