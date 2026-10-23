@@ -38,7 +38,21 @@ $('#h').value=st.h;$('#i').value=st.i;$('#d').value=st.d;
 ['h','i','d'].forEach(k=>$('#'+k).onchange=e=>{st[k]=+e.target.value;localStorage[k]=st[k];calc();draw()});
 $('#nav').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;draw()}};
 const card=(ic,l,v,s,c='')=>`<div class="card"><div class="cap"><span class="ic">${ic}</span>${l}</div><div class="v ${c}">${v}</div><div class="s">${s||''}</div></div>`;
-function calc(){D=Calc.compute(R,{hours:st.h,infl:st.i/100})}
+const FXID={USD:431,EUR:451,RUB:456},SC={USD:1,EUR:1,RUB:100},dayOf=d=>Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5,iso=d=>new Date(d*864e5).toISOString().slice(0,10);
+let fx=()=>1,fxUsed=false;
+async function getFx(R){const used=new Set(R.map(r=>r.cur));fxUsed=false;if(used.size==1&&used.has('USD'))return()=>1;fxUsed=true;
+ const need=['USD',...[...used].filter(c=>c!='USD'&&c!='BYN')],today=dayOf(new Date()),minD=Math.min(...R.flatMap(r=>[r.s,r.e,r.pay].filter(Boolean).map(dayOf))),lo=minD,N=today+62-lo+1,A={};
+ for(const c of need){let ch;try{ch=JSON.parse(localStorage['fx_'+c])}catch(e){ch=null}if(!ch||!ch.d)ch={d:{}};
+  const from=ch.lo&&minD>=ch.lo?Math.max(minD,ch.hi-3):minD;
+  try{for(let a=from;a<=today;a+=360){const b=Math.min(a+359,today),r=await fetch(`https://api.nbrb.by/exrates/rates/dynamics/${FXID[c]}?startdate=${iso(a)}&enddate=${iso(b)}`);if(!r.ok)throw new Error(r.status);
+    (await r.json()).forEach(x=>{ch.d[dayOf(new Date(x.Date))]=x.Cur_OfficialRate/SC[c]})}
+   ch.lo=Math.min(ch.lo||minD,minD);ch.hi=today;localStorage['fx_'+c]=JSON.stringify(ch)}
+  catch(e){if(!Object.keys(ch.d).length)throw new Error('Не удалось получить курсы НБ РБ для '+c+' ('+e.message+'). Проверьте интернет и попробуйте позже.')}
+  const keys=Object.keys(ch.d).map(Number).sort((x,y)=>x-y),arr=new Float64Array(N);let last=0,k=0;
+  for(let i=0;i<N;i++){while(k<keys.length&&keys[k]<=lo+i){last=ch.d[keys[k]];k++}arr[i]=last}
+  const f=arr.find(v=>v>0);for(let i=0;i<N&&!arr[i];i++)arr[i]=f;A[c]=arr}
+ const byn=(c,d)=>c=='BYN'?1:A[c][Math.min(Math.max(d-lo,0),N-1)];return(c,d)=>c=='USD'?1:byn(c,d)/byn('USD',d)}
+function calc(){D=Calc.compute(R,{hours:st.h,infl:st.i/100,fx})}
 function range(){const M=D.M;if(per=='all')return M;if(per=='12'||per=='now')return M.slice(-12);return M.filter(m=>Math.floor(m.idx/12)==+per)}
 function nice(v){const e=Math.pow(10,Math.floor(Math.log10(v/4))),f=v/4/e;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e}
 function chart(ms,vis,main,k0){const W=720,H=main?250:200,pl=42,pb=22,pt=10,tot=m=>m.s.reduce((a,v,k)=>a+(vis[k]?v+m.p[k]:0),0),mx=nice(Math.max(1,...ms.map(tot))*1.02)*4,bw=(W-pl)/ms.length,y=v=>pt+(H-pt-pb)*(1-v/mx);let g='';
@@ -58,12 +72,12 @@ function home(){const l=D.l12,A=D.all,dd=st.d,yrs=D.ys.map(s=>s.y),ms=range(),m=
  <div class="grid">${card('∑','Всего',$$(A.t),'за '+fm(A.mo)+' мес. работы')}${card('$','Сейчас',$$(D.salNow),'в месяц, ставка '+n2(D.rateNow)+' $/ч')}${card('★','Самый долгий стаж',D.longest.name,fm(D.longest.mo)+' мес.')}${card('↑','Рекорд',$$(D.rec.tot),mname(D.rec))}${card('%','Рост за 12 мес.',pc(l.r),'реальный, номинально '+pc(l.g),gc(l.r))}${card('↗','Рост в год (CAGR)',pc(D.cagrR),'реальный, номинально '+pc(D.cagr),gc(D.cagrR))}</div>
  <div class="card big"><div class="cap">Доход по месяцам</div><div class="leg" style="margin:8px 0">${D.C.map(c=>`<span data-k="${c.k}" style="opacity:${hide.has(c.k)?.4:1}"><i class="dot" style="background:${COL[c.k%6]}"></i>${c.name}</span>`).join('')}<span style="cursor:default"><i class="dot" style="background:#aaa;opacity:.5"></i>премии (светлее)</span></div>${chart(ms,D.C.map((_,k)=>!hide.has(k)),true)}
  <div class="s" id="det">${m?`<b>${mname(m)}:</b> ${D.C.map(c=>`${c.name} ${n0(m.s[c.k])}${m.p[c.k]>0?' + премия '+n0(m.p[c.k]):''}`).filter((t,k)=>m.s[k]||m.p[k]).join(' · ')} → <b>${$$(m.tot)}</b>`:'Нажмите на столбец, чтобы увидеть состав месяца. Пунктир это скользящее среднее за 12 мес.'}</div></div>`}
-function det(c){const sr=R.filter(r=>r.c==c.name&&!r.p).sort((a,b)=>a.s-b.s),pr=R.filter(r=>r.c==c.name&&r.p).sort((a,b)=>a.s-b.s),ix=d=>d.getFullYear()*12+d.getMonth(),
+function det(c){const u=r=>r.a*D.fx(r.cur,dayOf(r.s)),am=r=>r.cur=='USD'?$$(r.a):n0(r.a)+'\u00a0'+r.cur+' (≈'+$$(u(r))+')',sr=R.filter(r=>r.c==c.name&&!r.p).sort((a,b)=>a.s-b.s),pr=R.filter(r=>r.c==c.name&&r.p).sort((a,b)=>a.s-b.s),ix=d=>d.getFullYear()*12+d.getMonth(),
  ms=D.M.filter(m=>m.idx>=ix(c.from)&&m.idx<=(c.open?D.cur:ix(c.to)));
  return`<div class="det"><div class="grid" style="margin-top:0">${[['Месяцев',fm(c.mo)],['Зарплата',$$(c.sal)],['Премии',$$(c.pr)],['Доля дохода',(c.share*100).toFixed(1).replace('.',',')+'%'],['В день',$$(c.am/st.d)],['В час',n2(c.hr)+'\u00a0$']].map(([l,v])=>`<div><div class="cap">${l}</div><div class="v" style="font-size:20px">${v}</div></div>`).join('')}</div>
  ${chart(ms,D.C.map((_,k)=>k==c.k),false,c.k)}
- <div class="cols"><div><div class="cap">Зарплата по периодам</div><table>${sr.map((r,i)=>{const g=i&&sr[i-1].a>0?r.a/sr[i-1].a-1:null;return`<tr><td>${dt(r.s)} — ${r.e?dt(r.e):'н.в.'}</td><td>${$$(r.a)}</td><td class="${gc(g)}">${pc(g)}</td></tr>`}).join('')}</table></div>
- <div><div class="cap">Премии</div>${pr.length?`<table>${pr.map(r=>`<tr><td>${r.e?'за '+dt(r.s)+' — '+dt(r.e):dt(r.s)+' (за год до даты)'}</td><td>${$$(r.a)}</td></tr>`).join('')}</table>`:'<div class="s" style="margin-top:10px">Премий не было</div>'}</div></div></div>`}
+ <div class="cols"><div><div class="cap">Зарплата по периодам</div><table>${sr.map((r,i)=>{const g=i&&u(sr[i-1])>0?u(r)/u(sr[i-1])-1:null;return`<tr><td>${dt(r.s)} — ${r.e?dt(r.e):'н.в.'}</td><td>${am(r)}</td><td class="${gc(g)}">${pc(g)}</td></tr>`}).join('')}</table></div>
+ <div><div class="cap">Премии</div>${pr.length?`<table>${pr.map(r=>`<tr><td>${r.e?'за '+dt(r.s)+' — '+dt(r.e):dt(r.s)+' (за год до даты)'}</td><td>${am(r)}</td></tr>`).join('')}</table>`:'<div class="s" style="margin-top:10px">Премий не было</div>'}</div></div></div>`}
 function cos(){return`<h2>Компании</h2><div class="grid">${D.C.map(c=>{const o=ex.has(c.k),col=COL[c.k%6];return`<div class="card co ${o?'open':''}" style="border-color:${col}55"><div class="ch" data-co="${c.k}"><div class="cap"><i class="dot" style="background:${col}"></i>${c.name}<span class="chev">${o?'▴':'▾'}</span></div><div class="v">${$$(c.t)}</div><div class="s">${dt(c.from)} — ${c.open?'н.в.':dt(c.to)} · ${fm(c.mo)} мес.<br>${(c.share*100).toFixed(1).replace('.',',')}% дохода · премии ${$$(c.pr)}</div><div class="s" style="margin-top:10px;color:var(--ink)">${$$(c.am)} в мес. · ${$$(c.ay)} в год · ${n2(c.hr)} $/ч</div></div>${o?det(c):''}</div>`}).join('')}</div><div class="s">Нажмите на компанию, чтобы развернуть подробности.</div>`}
 function years(){const l=D.l12,p=D.p12;return`<h2>Годы</h2><div class="grid">${card('%','12 мес. к предыдущим',pc(l.r),'номинально: '+pc(l.g),gc(l.r))}${card('Ø','Средний рост год к году',pc(D.avgR),'номинально: '+pc(D.avgG),gc(D.avgR))}${card('↗','CAGR',pc(D.cagrR),'номинально: '+pc(D.cagr),gc(D.cagrR))}</div>
  <div class="card big"><table><tr><th>Период</th><th>Мес.</th><th>Заработано</th><th>В месяц</th><th>В час</th><th>Рост</th><th>Реальный</th></tr>
@@ -81,6 +95,6 @@ async function load(){try{
  if(location.protocol=='file:')throw new Error('Страница открыта как файл на компьютере. Браузер так не пускает к данным из интернета. Откройте сайт по адресу GitHub Pages (https://...github.io/...).');
  let r;try{r=await fetch(CFG.csv,{cache:'no-store'})}catch(e){throw new Error('Браузер не смог получить таблицу (сеть, блокировщик рекламы или Google отклонил запрос). <a href="'+CFG.csv+'" target="_blank">Откройте ссылку на таблицу напрямую</a>: должен скачаться или показаться CSV. Если там ошибка, лист не опубликован как CSV.')}
  if(!r.ok)throw new Error('Таблица недоступна (код '+r.status+'). Проверьте публикацию листа и ссылку в config.js');
- R=Calc.rows(await r.text());calc();$('#upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});draw()}catch(e){$('#main').innerHTML=`<div class="err"><b>Не удалось загрузить данные.</b><br>${e.message}</div>`}}
+ R=Calc.rows(await r.text());fx=await getFx(R);calc();$('#upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})+(fxUsed?' · курсы НБ РБ, всё в USD':'');draw()}catch(e){$('#main').innerHTML=`<div class="err"><b>Не удалось загрузить данные.</b><br>${e.message}</div>`}}
 load();
 </script></body></html>
