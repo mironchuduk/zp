@@ -12,7 +12,7 @@ function rows(csv){const T=parseCSV(csv.replace(/^\uFEFF/,'')),h=(T[0]||[]).map(
   out.push({c:r[ic].trim(),p:(r[it]||'').trim()=='Премия',s,e,a,cur:cu,pay})});
  if(!out.length)throw new Error('В таблице нет данных');return out}
 function compute(R,o){
- const now=o.now||new Date(),cur=ms(now),H=o.hours,I=o.infl,fx=o.fx||(()=>1);
+ const now=o.now||new Date(),cur=ms(now),H=o.hours,I=o.infl,fx=o.fx||(()=>1),cp=o.cpi||(i=>Math.pow(1+I,i/12)),rl=(g,a,b)=>g==null?null:(1+g)/(cp(b)/cp(a))-1;
  const cos=[...new Set(R.map(r=>r.c))],first=Math.min(...R.map(r=>ms(r.s))),n=cur-first+1,K=cos.length;
  const U=(y,m,d)=>Date.UTC(y,m,d)/864e5,UD=d=>U(d.getFullYear(),d.getMonth(),d.getDate());
  const fd=U(Math.floor(first/12),first%12,1),ed=U(Math.floor(cur/12),cur%12+1,0),T=ed-fd+1;
@@ -35,9 +35,9 @@ function compute(R,o){
  M.forEach((m,i)=>m.ma=avg(M.slice(Math.max(0,i-11),i+1).map(x=>x.tot)));
  const st=(a,b)=>{let mo=0,t=0,p=0,oc=0;M.forEach(m=>{if(m.idx>=a&&m.idx<=b){mo+=m.any;t+=m.tot;p+=m.prT;oc+=m.occ}});const am=mo>0?t/mo:null;return{mo,t,p,am,ay:am==null?null:am*12,hr:oc>0?t/(oc*H):null}};
  const g=(c,p)=>p>0&&c!=null?c/p-1:null,real=x=>x==null?null:(1+x)/(1+I)-1;
- const l12=st(cur-11,cur),p12=st(cur-23,cur-12),all=st(first,cur);l12.g=g(l12.am,p12.am);l12.r=real(l12.g);
+ const l12=st(cur-11,cur),p12=st(cur-23,cur-12),all=st(first,cur);l12.g=g(l12.am,p12.am);l12.r=rl(l12.g,cur-18,cur-6);
  const ys=[];for(let y=Math.floor(first/12);y<=now.getFullYear();y++){const s=st(y*12,y*12+11);s.y=y;ys.push(s)}
- ys.forEach((s,i)=>{s.g=i?g(s.am,ys[i-1].am):null;s.r=real(s.g)});
+ ys.forEach((s,i)=>{s.g=i?g(s.am,ys[i-1].am):null;s.r=i?rl(s.g,(s.y-1)*12+5,s.y*12+5):null});
  const base=ys.find(s=>s.am>0),last=ys[ys.length-1],N=base?last.y-base.y:0;
  const cagr=base&&N>0?Math.pow(last.am/base.am,1/N)-1:null;
  const gg=ys.map(s=>s.g).filter(x=>x!=null),rr=ys.map(s=>s.r).filter(x=>x!=null);
@@ -46,7 +46,7 @@ function compute(R,o){
  C.forEach(c=>{c.ay=c.am*12;c.hr=c.am/H});
  const today=UD(now),act=R.filter(r=>!r.p&&UD(r.s)<=today&&(!r.e||UD(r.e)>=today)),salNow=sum(act.map(r=>r.a*fx(r.cur,today))),nAct=new Set(act.map(r=>r.c)).size;
  const rec=M.reduce((a,m)=>m.tot>a.tot?m:a,M[0]);
- return{fx,M,C,first,cur,l12,p12,all,ys,base,cagr,cagrR:real(cagr),avgG:avg(gg),avgR:avg(rr),
+ return{fx,M,C,first,cur,l12,p12,all,ys,base,cagr,cagrR:base&&N>0&&cagr!=null?Math.pow((last.am/base.am)/(cp(last.y*12+5)/cp(base.y*12+5)),1/N)-1:null,avgG:avg(gg),avgR:avg(rr),
   salNow,rateNow:nAct?salNow/(nAct*H):null,rec,longest:C.reduce((a,c)=>c.mo>a.mo?c:a,C[0])}}
 const api={rows,compute};if(typeof module!='undefined')module.exports=api;else root.Calc=api;
 })(this);
