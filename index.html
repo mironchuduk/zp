@@ -36,7 +36,7 @@ svg text{font-size:11px;fill:var(--mut)}.bar{transition:opacity .15s}.tip{positi
 .grid[data-g=stat],.grid[data-g=infl],.grid[data-g=fx],.grid[data-g=growth]{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .sb{display:flex;border-radius:7px;overflow:hidden;background:var(--dbar)}.sb span{display:block;height:100%}.pm{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:center;margin:14px 0 6px}.big2{font-size:38px;font-weight:300;line-height:1.1}@media(max-width:760px){h2{min-height:0;margin-bottom:12px}.pm{grid-template-columns:1fr;gap:12px}.hs{padding:10px 14px;border-left:0}.hs:first-child{padding-left:14px}.dist{grid-template-columns:1fr;justify-items:center}.dr{grid-template-columns:1fr auto}.dbar{display:none}.dist>div:last-child{width:100%}.wrap{grid-template-columns:1fr;padding:16px 14px 90px;gap:16px}.logo,.set{display:none}nav{position:fixed;left:12px;right:12px;bottom:12px;display:flex;z-index:5}nav a{flex:1;text-align:center;padding:10px 4px}.hero{padding:20px}.hr{grid-template-columns:1fr 1fr}.hs b{font-size:26px}.hs small{white-space:normal}.cols{grid-template-columns:1fr}}
 </style></head><body><div class="tip" id="tip"></div><button id="th" aria-label="Тема"></button>
-<div class="wrap"><aside><div class="logo">zp</div><nav id="nav"><a data-v="home">Главная</a><a data-v="cos">Компании</a><a data-v="years">Годы</a><a data-v="career">Карьера</a></nav>
+<div class="wrap"><aside><div class="logo">zp</div><nav id="nav"><a data-v="home">Главная</a><a data-v="cos">Компании</a><a data-v="years">Годы</a><a data-v="career">Карьера</a><a data-v="market">Курсы и инфляция</a></nav>
 <div class="set">Настройки<label>Часов в месяц<input id="h" type="number" step="0.1"></label><label>Дней в месяц<input id="d" type="number" step="1"></label><label>Инфляция (запасная), %<input id="i" type="number" step="0.1"></label><div id="upd" style="margin-top:10px"></div><div id="rst" style="margin-top:8px;cursor:pointer;text-decoration:underline">Сбросить порядок блоков</div></div></aside>
 <main id="main"><div class="card">Загружаю данные…</div></main></div>
 <script src="calc.js"></script><script src="config.js"></script>
@@ -51,27 +51,30 @@ $('#nav').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;draw()}};
 const card=(ic,l,v,s,c='')=>`<div class="card" data-cid="${l}"><span class="mc"><b data-mc="-1">‹</b><b data-mc="1">›</b><i class="gc" title="Перетащить">⠿</i></span><div class="cap"><span class="ic">${ic}</span>${l}</div><div class="v ${c}">${v}</div><div class="s">${s||''}</div></div>`;
 const FXID={USD:431,EUR:451,RUB:456},SC={USD:1,EUR:1,RUB:100},dayOf=d=>Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5,iso=d=>new Date(d*864e5).toISOString().slice(0,10);
 let fx=()=>1,fxUsed=false;
-async function getFx(R){const used=new Set(R.map(r=>r.cur));fxUsed=false;if(used.size==1&&used.has('USD'))return()=>1;fxUsed=true;
- const need=['USD',...[...used].filter(c=>c!='USD'&&c!='BYN')],today=dayOf(new Date()),minD=Math.min(...R.flatMap(r=>[r.s,r.e,r.pay].filter(Boolean).map(dayOf))),lo=minD,N=today+62-lo+1,A={};
+async function fxArr(need,minD){const today=dayOf(new Date()),lo=minD,N=today+62-lo+1,A={},lastD={};
  for(const c of need){let ch;try{ch=JSON.parse(localStorage['fx_'+c])}catch(e){ch=null}if(!ch||!ch.d)ch={d:{}};
   const from=ch.lo&&minD>=ch.lo?Math.max(minD,ch.hi-3):minD;
   try{for(let a=from;a<=today;a+=360){const b=Math.min(a+359,today),r=await fetch(`https://api.nbrb.by/exrates/rates/dynamics/${FXID[c]}?startdate=${iso(a)}&enddate=${iso(b)}`);if(!r.ok)throw new Error(r.status);
     (await r.json()).forEach(x=>{ch.d[dayOf(new Date(x.Date))]=x.Cur_OfficialRate/SC[c]})}
    ch.lo=Math.min(ch.lo||minD,minD);ch.hi=today;localStorage['fx_'+c]=JSON.stringify(ch)}
   catch(e){if(!Object.keys(ch.d).length)throw new Error('Не удалось получить курсы НБ РБ для '+c+' ('+e.message+'). Проверьте интернет и попробуйте позже.')}
-  const keys=Object.keys(ch.d).map(Number).sort((x,y)=>x-y),arr=new Float64Array(N);let last=0,k=0;
+  const keys=Object.keys(ch.d).map(Number).sort((x,y)=>x-y),arr=new Float64Array(N);lastD[c]=keys[keys.length-1]||0;let last=0,k=0;
   for(let i=0;i<N;i++){while(k<keys.length&&keys[k]<=lo+i){last=ch.d[keys[k]];k++}arr[i]=last}
   const f=arr.find(v=>v>0);for(let i=0;i<N&&!arr[i];i++)arr[i]=f;A[c]=arr}
+ return{A,lo,N,lastD}}
+async function getFx(R){const used=new Set(R.map(r=>r.cur));fxUsed=false;if(used.size==1&&used.has('USD'))return()=>1;fxUsed=true;
+ const need=['USD',...[...used].filter(c=>c!='USD'&&c!='BYN')],minD=Math.min(...R.flatMap(r=>[r.s,r.e,r.pay].filter(Boolean).map(dayOf))),{A,lo,N}=await fxArr([...new Set(need)],minD);
  const byn=(c,d)=>c=='BYN'?1:A[c][Math.min(Math.max(d-lo,0),N-1)];return(c,d)=>c=='USD'?1:byn(c,d)/byn('USD',d)}
 const CW=()=>Math.max(520,Math.min(2000,(($('#main')||{}).clientWidth||772)-52));
-let cpi=i=>Math.pow(1+st.i/100,i/12),cpiSrc='ручная ставка';
+let cpi=i=>Math.pow(1+st.i/100,i/12),cpiSrc='ручная ставка',cpiMeta={src:'ручная ставка',monthly:false},loadedAt=null;
 function mkCpi(p){p.sort((a,b)=>a[0]-b[0]);const f=p[0],l=p[p.length-1],g=()=>1+st.i/100;
  return i=>{if(i<=f[0])return f[1]/Math.pow(g(),(f[0]-i)/12);if(i>=l[0])return l[1]*Math.pow(g(),(i-l[0])/12);let k=0;while(p[k+1][0]<i)k++;const a=p[k],b=p[k+1];return a[1]*Math.pow(b[1]/a[1],(i-a[0])/(b[0]-a[0]))}}
 async function fredCpi(){const r=await fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL&cosd=2015-01-01');if(!r.ok)throw 0;const p=(await r.text()).trim().split('\n').slice(1).map(l=>l.split(',')).map(([d,v])=>[+d.slice(0,4)*12+(+d.slice(5,7)-1),parseFloat(v)]).filter(x=>x[1]>0);if(p.length<12)throw 0;return p}
+async function blsCpi(){const y=new Date().getFullYear(),r=await fetch(`https://api.bls.gov/publicAPI/v1/timeseries/data/CUUR0000SA0?startyear=${y-9}&endyear=${y}`);if(!r.ok)throw 0;const d=(await r.json()).Results.series[0].data,p=d.filter(x=>/^M(0[1-9]|1[0-2])$/.test(x.period)).map(x=>[+x.year*12+(+x.period.slice(1)-1),parseFloat(x.value)]);if(p.length<12)throw 0;return p}
 async function wbCpi(){const r=await fetch('https://api.worldbank.org/v2/country/USA/indicator/FP.CPI.TOTL.ZG?format=json&per_page=100&date=2010:'+new Date().getFullYear());if(!r.ok)throw 0;const j=(await r.json())[1].filter(x=>x.value!=null).map(x=>[+x.date,x.value]).sort((a,b)=>a[0]-b[0]);if(!j.length)throw 0;let q=1;const p=[[(j[0][0]-1)*12+6,1]];j.forEach(([y,v])=>{q*=1+v/100;p.push([y*12+6,q])});return p}
-async function loadCpi(){let c;try{c=JSON.parse(localStorage.cpi)}catch(e){}
- if(!c||Date.now()-c.t>6048e5){let n=null;try{n={pts:await fredCpi(),src:'США CPI (FRED), помесячно'}}catch(e){try{n={pts:await wbCpi(),src:'США CPI (World Bank), по годам'}}catch(e2){}}if(n){c={t:Date.now(),...n};localStorage.cpi=JSON.stringify(c)}}
- if(c&&c.pts&&c.pts.length>1){cpi=mkCpi(c.pts);cpiSrc=c.src}else{cpi=i=>Math.pow(1+st.i/100,i/12);cpiSrc='ручная ставка '+st.i+'%'}}
+async function loadCpi(){let c;try{c=JSON.parse(localStorage.cpi2)}catch(e){}
+ if(!c||Date.now()-c.t>6048e5){let n=null;try{n={pts:await fredCpi(),src:'США CPI (FRED), помесячно'}}catch(e){try{n={pts:await blsCpi(),src:'США CPI (BLS), помесячно'}}catch(e1){try{n={pts:await wbCpi(),src:'США CPI (World Bank), по годам'}}catch(e2){}}}if(n){c={t:Date.now(),...n};localStorage.cpi2=JSON.stringify(c)}}
+ if(c&&c.pts&&c.pts.length>1){cpi=mkCpi(c.pts);cpiSrc=c.src;cpiMeta={src:c.src,t:c.t,monthly:/помесячно/.test(c.src),pts:c.pts,last:Math.max(...c.pts.map(p=>p[0]))}}else{cpi=i=>Math.pow(1+st.i/100,i/12);cpiSrc='ручная ставка '+st.i+'%';cpiMeta={src:'ручная ставка',monthly:false}}}
 function calc(){D=Calc.compute(R,{hours:st.h,infl:st.i/100,fx,cpi})}
 function range(){const M=D.M;if(per=='all'||per=='now')return M;if(per=='12')return M.slice(-12);return M.filter(m=>Math.floor(m.idx/12)==+per)}
 function nice(v){const e=Math.pow(10,Math.floor(Math.log10(v/4))),f=v/4/e;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e}
@@ -105,7 +108,8 @@ function premBlock(ms){const T=ms.reduce((a,m)=>a+m.tot,0),P=ms.reduce((a,m)=>a+
  ${C.map(x=>`<div class="dr" style="grid-template-columns:150px 1fr 190px"><div><i class="dot" style="background:${COL[x.c.k%6]}"></i><b>${x.c.name}</b></div>${bar(x.p,x.t,8)}<div class="r"><b>${pct(x.p/x.t)}</b><small>${$$(x.p)} из ${$$(x.t)}</small></div></div>`).join('')}</div>`}
 function growthBlock(){const M=D.M,cur=D.cur,cy=Math.floor(cur/12),sg=x=>(x>0?'+':'')+$$(x),S=(a,b)=>M.filter(m=>m.idx>=a&&m.idx<=b).reduce((s,m)=>s+m.tot,0),
  cmp=(lab,pl,a,b,a0,b0)=>{const c=S(a,b),p=S(a0,b0);if(!(p>0))return null;const g=c/p-1,r=cpi((a+b)/2)/cpi((a0+b0)/2);return{lab,pl,c,p,d:c-p,g,rg:(1+g)/r-1,dr:c-p*r}},
- rows=[cmp('Последние 12 мес.','пред. 12 мес.',cur-11,cur,cur-23,cur-12),cmp(`${cy} (янв–${MN[cur%12]})`,`${cy-1} (янв–${MN[cur%12]})`,cy*12,cur,(cy-1)*12,cur-12)];
+ pr=cur%12==0?'янв':'янв–'+MN[cur%12],
+ rows=[cmp('Последние 12 мес.','пред. 12 мес.',cur-11,cur,cur-23,cur-12),cmp(`${cy} (${pr})`,`${cy-1} (${pr})`,cy*12,cur,(cy-1)*12,cur-12)];
  for(let y=cy-1;y>Math.floor(D.first/12);y--)rows.push(cmp(String(y),String(y-1),y*12,y*12+11,(y-1)*12,(y-1)*12+11));
  const R2=rows.filter(Boolean),ytd=R2.find(x=>x.lab.startsWith(cy+' ')),l=D.l12;
  return`<div class="card big"><div class="cap">Рост дохода${ni('Сравниваются одинаковые отрезки года: например, январь–октябрь этого года с январём–октябрём прошлого. «С учётом инфляции»: доход прошлого периода пересчитан в цены текущего (в скобках разница в долларах). Инфляция: '+cpiSrc)}</div>
@@ -178,12 +182,48 @@ document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest
 document.addEventListener('mousedown',e=>{const g=e.target.closest&&e.target.closest('.gc');if(g)g.closest('.card').draggable=true});
 document.addEventListener('dragover',e=>{if(!drag||!drag.classList.contains('card'))return;e.preventDefault();const t=e.target.closest('.card');if(t&&t!=drag&&t.parentNode==drag.parentNode){const r=t.getBoundingClientRect();t.parentNode.insertBefore(drag,e.clientX<r.left+r.width/2?t:t.nextSibling)}});
 if(typeof window!='undefined'){let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(D)draw()},200)})}
-function draw(){document.querySelectorAll('nav a').forEach(a=>a.className=a.dataset.v==view?'on':'');$('#main').innerHTML={home,cos,years,career}[view]();const p=$('#per');if(p){p.value=per;p.onchange=e=>{per=e.target.value;sel=null;draw()}}cardOrder()}
+let MK=null,MKerr=null,MKbusy=false,rp='all';
+const mi=i=>MN[i%12]+' '+Math.floor(i/12),dstr=d=>dt(new Date(d*864e5+432e5)),
+ lastLbl=()=>cpiMeta.pts?(cpiMeta.monthly?mi(cpiMeta.last):Math.floor(cpiMeta.last/12)+' год'):'нет данных';
+function yInfl(y){const P=cpiMeta.pts;if(!P)return{v:st.i/100,note:'ручная ставка'};
+ if(cpiMeta.monthly){const m=P.filter(p=>Math.floor(p[0]/12)==y);if(m.length){const mm=new Set(m.map(p=>p[0]%12)),pv=P.filter(p=>Math.floor(p[0]/12)==y-1&&mm.has(p[0]%12));
+  if(pv.length==m.length)return{v:(m.reduce((s,p)=>s+p[1],0)/m.length)/(pv.reduce((s,p)=>s+p[1],0)/pv.length)-1,note:m.length<12?'данные до '+MN[Math.max(...m.map(p=>p[0]%12))]:''}}
+  return{v:cpi(y*12+6)/cpi((y-1)*12+6)-1,note:'оценка'}}
+ return{v:cpi(y*12+6)/cpi((y-1)*12+6)-1,note:y<=Math.floor(cpiMeta.last/12)?'':'оценка'}}
+function cpiBlock(){const E=Math.min(D.cur,cpiMeta.last||D.cur),S=D.first,ratio=cpi(E)/cpi(S),avg=Math.pow(ratio,12/Math.max(12,E-S))-1,cy=Math.floor(D.cur/12),fy=Math.floor(S/12),rows=[];
+ for(let y=cy;y>=fy;y--)rows.push({y,...yInfl(y),cum:cpi(Math.min(y*12+11,D.cur))/cpi(S)-1});
+ const rec=cpiMeta.monthly?card('↻','За последние 12 мес.',pc(cpi(E)/cpi(E-12)-1),'до '+mi(E)):card('↻','Последний год с данными',pc(yInfl(Math.floor(cpiMeta.last/12)).v),'за '+lastLbl()||'');
+ return`<div class="card big"><div class="cap">Инфляция США (CPI)${ni('Годовая инфляция по среднему индексу цен за год. «Оценка» значит, что официальных данных за период ещё нет и взята запасная ставка из настроек. Накопленная считается с начала вашей карьеры.')}</div>
+ <div class="grid" data-g="cpi" style="margin:12px 0">${card('Ø','Средняя за карьеру',pc(avg),'в год, по данным до '+lastLbl())}${card('∑','Накопленная за карьеру',pc(ratio-1),'цены в '+n2(ratio)+' раза')}${rec}${card('◷','Свежесть данных',lastLbl(),cpiMeta.src)}</div>
+ <table><tr><th>Год</th><th>Инфляция за год</th><th>Накопленная с начала карьеры</th><th>Данные</th></tr>${rows.map(x=>`<tr><td><b>${x.y}</b></td><td>${pc(x.v)}</td><td>${pc(x.cum)}</td><td class="s">${x.note||'официальные'}</td></tr>`).join('')}</table></div>`}
+async function loadMarket(){const minD=dayOf(new Date(Math.floor(D.first/12),D.first%12,1));MK={...await fxArr(['USD','EUR','RUB'],minD),t:Date.now()}}
+const bnk=(c,d)=>c=='BYN'?1:MK.A[c][Math.min(Math.max(d-MK.lo,0),MK.N-1)],unitsUsd=(c,d)=>bnk('USD',d)/bnk(c,d);
+function fxAvgBlock(){const today=dayOf(new Date()),CS=['BYN','EUR','RUB'],cy=new Date().getFullYear(),fy=Math.floor(D.first/12),
+ avg=(c,a,b)=>{let s=0,n=0;for(let d=Math.max(a,MK.lo);d<=Math.min(b,today);d++){s+=unitsUsd(c,d);n++}return n?s/n:null},
+ yr=(y,c)=>avg(c,dayOf(new Date(y,0,1)),dayOf(new Date(y,11,31))),rows=[['Сегодня',CS.map(c=>unitsUsd(c,today)),null],['Вся карьера, среднее',CS.map(c=>avg(c,MK.lo,today)),null]];
+ for(let y=cy;y>=fy;y--)rows.push([y==cy?y+' (на сегодня)':String(y),CS.map(c=>yr(y,c)),CS.map(c=>yr(y-1,c))]);
+ return`<div class="card big"><div class="cap">Курсы валют: сколько стоит 1 доллар${ni('Официальные курсы НБ РБ. Для года среднее по дням года, процент: изменение к предыдущему году. Рост числа значит, что доллар подорожал.')}</div>
+ <table><tr><th>Период</th>${CS.map(c=>`<th>1 $ = ${c}</th>`).join('')}</tr>${rows.map(([n,v,p])=>`<tr><td><b>${n}</b></td>${v.map((x,i)=>`<td>${n2(x)}${p&&p[i]?` <span class="s">${pc(x/p[i]-1)}</span>`:''}</td>`).join('')}</tr>`).join('')}</table></div>`}
+function fxChgBlock(){const today=dayOf(new Date()),CS=['USD','EUR','BYN','RUB'],cy=new Date().getFullYear(),fy=Math.floor(D.first/12),
+ ys=[];for(let y=cy;y>=fy;y--)ys.push(y);
+ let d1,d2;if(rp=='all'){d1=MK.lo;d2=today}else if(rp=='12'){d1=today-365;d2=today}else{const y=+rp;d1=Math.max(dayOf(new Date(y,0,1))-1,MK.lo);d2=Math.min(dayOf(new Date(y,11,31)),today)}
+ const v=(a,b,d)=>bnk(a,d)/bnk(b,d),seg=[['all','Вся карьера'],['12','12 месяцев'],...ys.map(y=>[String(y),String(y)])].map(([k,t])=>`<button class="${k==rp?'on':''}" data-rp="${k}">${t}</button>`).join('');
+ return`<div class="card big"><div class="cap">Как менялись курсы, ${dstr(d1)} — ${dstr(d2)}${ni('Как изменилась стоимость валюты в строке, если измерять её в валюте столбца. Например, строка EUR, столбец USD: +5% значит, что евро подорожал к доллару на 5%.')}</div>
+ <div class="seg" style="margin:12px 0">${seg}</div>
+ <table><tr><th>Валюта</th>${CS.map(c=>`<th>к ${c}</th>`).join('')}</tr>${CS.map(a=>`<tr><td><b>${a}</b></td>${CS.map(b=>{if(a==b)return'<td class="s">—</td>';const g=v(a,b,d2)/v(a,b,d1)-1;return`<td class="${gc(g)}">${pc(g)}</td>`}).join('')}</tr>`).join('')}</table></div>`}
+function srcBlock(){const r=(n,t)=>`<div class="dr" style="grid-template-columns:170px 1fr"><div><b>${n}</b></div><div class="s" style="font-size:13px">${t}</div></div>`,tm=t=>new Date(t).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+ return`<div class="card big"><div class="cap">Откуда данные</div>${r('Таблица Google',`${R.length} строк, загружена ${loadedAt?tm(loadedAt):'—'}`)}${r('Курсы валют','НБ РБ (api.nbrb.by): USD, EUR, RUB к белорусскому рублю'+(MK?`, последний курс на ${dstr(Math.max(...Object.values(MK.lastD)))}, загружено ${tm(MK.t)}`:fxUsed?'':' (для расчётов не нужны: все суммы в USD)'))}${r('Инфляция',`${cpiMeta.src}, последние данные: ${lastLbl()}${cpiMeta.t?', обновлено '+tm(cpiMeta.t):''}`)}</div>`}
+function market(){if(!MK&&!MKbusy&&!MKerr){MKbusy=true;loadMarket().then(()=>{MKbusy=false;if(view=='market')draw()}).catch(e=>{MKbusy=false;MKerr=e.message;if(view=='market')draw()})}
+ const L=[],B=(id,x)=>{L.push({id,html:x});return''};
+ const html=`${B('cpi',cpiBlock())}${MK?B('fxavg',fxAvgBlock())+B('fxchg',fxChgBlock()):B('fxload',`<div class="card big"><div class="cap">Курсы валют</div><div class="s" style="margin-top:10px">${MKerr||'Загружаю курсы НБ РБ…'}</div></div>`)}${B('src',srcBlock())}`;
+ return'<h2>Курсы и инфляция</h2>'+wrap('market',L)}
+function draw(){document.querySelectorAll('nav a').forEach(a=>a.className=a.dataset.v==view?'on':'');$('#main').innerHTML={home,cos,years,career,market}[view]();const p=$('#per');if(p){p.value=per;p.onchange=e=>{per=e.target.value;sel=null;draw()}}cardOrder()}
 const tip=$('#tip'),th=$('#th');
 function setTheme(t){document.documentElement.dataset.theme=t;localStorage.theme=t;th.textContent=t=='dark'?'☀':'☾';document.querySelector('meta[name=theme-color]').content=t=='dark'?'#0e0f14':'#f3f4f8'}
 th.onclick=()=>setTheme(document.documentElement.dataset.theme=='dark'?'light':'dark');setTheme(document.documentElement.dataset.theme||'light');
-document.addEventListener('click',e=>{const t=e.target,k=t.closest('[data-k]'),y=t.closest('[data-y]'),co=t.closest('[data-co]'),pb=t.closest('[data-p]');
- if(pb){per=pb.dataset.p;sel=null;draw()}
+document.addEventListener('click',e=>{const t=e.target,k=t.closest('[data-k]'),y=t.closest('[data-y]'),co=t.closest('[data-co]'),pb=t.closest('[data-p]'),rb=t.closest('[data-rp]');
+ if(rb){rp=rb.dataset.rp;draw()}
+ else if(pb){per=pb.dataset.p;sel=null;draw()}
  else if(k){const i=+k.dataset.k;hide.has(i)?hide.delete(i):hide.add(i);draw()}
  else if(co){const i=+co.dataset.co;ex.has(i)?ex.delete(i):ex.add(i);draw()}
  else if(y&&y.dataset.y){per=y.dataset.y;view='home';sel=null;draw()}
@@ -193,6 +233,6 @@ async function load(){try{
  if(location.protocol=='file:')throw new Error('Страница открыта как файл на компьютере. Браузер так не пускает к данным из интернета. Откройте сайт по адресу GitHub Pages (https://...github.io/...).');
  let r;try{r=await fetch(CFG.csv,{cache:'no-store'})}catch(e){throw new Error('Браузер не смог получить таблицу (сеть, блокировщик рекламы или Google отклонил запрос). <a href="'+CFG.csv+'" target="_blank">Откройте ссылку на таблицу напрямую</a>: должен скачаться или показаться CSV. Если там ошибка, лист не опубликован как CSV.')}
  if(!r.ok)throw new Error('Таблица недоступна (код '+r.status+'). Проверьте публикацию листа и ссылку в config.js');
- R=Calc.rows(await r.text());fx=await getFx(R);try{await loadCpi()}catch(e){}calc();$('#upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});$('#upd').title=(fxUsed?'Курсы НБ РБ, всё в USD. ':'')+'Инфляция: '+cpiSrc;draw()}catch(e){$('#main').innerHTML=`<div class="err"><b>Не удалось загрузить данные.</b><br>${e.message}</div>`}}
+ R=Calc.rows(await r.text());loadedAt=new Date();fx=await getFx(R);try{await loadCpi()}catch(e){}calc();$('#upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});$('#upd').title=(fxUsed?'Курсы НБ РБ, всё в USD. ':'')+'Инфляция: '+cpiSrc;draw()}catch(e){$('#main').innerHTML=`<div class="err"><b>Не удалось загрузить данные.</b><br>${e.message}</div>`}}
 load();
 </script></body></html>
