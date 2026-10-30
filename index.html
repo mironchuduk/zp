@@ -3,7 +3,7 @@
 <style>
 :root{--arr:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231c1c24' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");--ink:#1c1c24;--mut:#7a7d8c;--ac:#6c4de0;--line:#e6e7ee;--bg:#f3f4f8;--g1:#f6eee9;--g2:#e9ecfb;--card:#fafafc;--glass:rgba(255,255,255,.7);--on:#e4e5ec;--ic:#eef;--inp:#fff;--hover:#f1f0fb;--dbar:#eceef5;--up:#2e7d32;--dn:#c62828;--tipbg:#fff;--errbg:#fdecea;--errfg:#8a1c1c;--h1:#dcebfb;--h2:#dcd3fa;--h3:#f7dbe8;--hb:#fafbfd;--sh:#0000000d;color-scheme:light}
 [data-theme=dark]{--arr:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23f1f2f6' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");--ink:#f1f2f6;--mut:#8e91a1;--ac:#9b82ff;--line:#2b2d38;--bg:#0e0f14;--g1:#1d1633;--g2:#101c2e;--card:#17181f;--glass:rgba(30,31,41,.72);--on:#2a2c3a;--ic:#27243d;--inp:#1f2029;--hover:#20212c;--dbar:#2a2c38;--up:#5fd08a;--dn:#ff7b86;--tipbg:#242530;--errbg:#3a1c1f;--errfg:#ffb4b4;--h1:rgba(58,110,170,.35);--h2:rgba(108,77,224,.42);--h3:rgba(228,96,122,.26);--hb:#191a23;--sh:#0006;color-scheme:dark}
-#th{position:fixed;top:14px;right:16px;z-index:8;width:40px;height:40px;border-radius:50%;border:0;background:var(--glass);box-shadow:0 2px 10px #0003;color:var(--ink);font-size:18px;cursor:pointer;backdrop-filter:blur(8px)}
+#tools{position:fixed;top:14px;right:16px;z-index:8;display:flex;gap:8px;align-items:center}#tools select{box-shadow:0 2px 10px #0003;background-color:var(--glass);font-weight:600}#lg{font:700 12px "Onest",sans-serif!important}#lg,#th{width:40px;height:40px;border-radius:50%;border:0;background:var(--glass);box-shadow:0 2px 10px #0003;color:var(--ink);font-size:18px;cursor:pointer;backdrop-filter:blur(8px)}
 *{box-sizing:border-box}body{margin:0;font:14px/1.4 "Onest",-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg) radial-gradient(900px 500px at 100% 0,var(--g1) 0,transparent 60%),radial-gradient(700px 500px at 0 100%,var(--g2) 0,transparent 60%) fixed}
 .wrap{padding:32px 36px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:40px}
 .logo{font:700 68px/1 "Caveat",cursive;height:76px;display:flex;align-items:center;margin:0 0 14px 6px;letter-spacing:.02em}
@@ -26,28 +26,29 @@ table{width:100%;border-collapse:collapse}th{font-size:11px;letter-spacing:.08em
 svg text{font-size:11px;fill:var(--mut)}.bar{transition:opacity .15s}.tip{position:fixed;color:var(--ink);background:var(--tipbg);border-radius:12px;padding:8px 12px;box-shadow:0 6px 24px #0003;pointer-events:none;font-size:12px;display:none;z-index:9}
 .leg span{cursor:pointer;margin-right:14px;font-size:12px}.err{padding:20px;background:var(--errbg);border-radius:18px;color:var(--errfg)}
 .card.big+.card.big,.grid+.card.big{margin-top:14px}.dist{display:grid;grid-template-columns:190px 1fr;gap:28px;align-items:center;margin-top:12px}.dr{display:grid;grid-template-columns:150px 1fr 170px;gap:14px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}.dbar{height:8px;border-radius:6px;background:var(--dbar);overflow:hidden}.dbar span{display:block;height:100%;border-radius:6px}.dr .r{text-align:right;white-space:nowrap}.dr .r small{display:block;color:var(--mut);font-size:11px}circle[data-tip]{transition:stroke-width .15s}circle[data-tip]:hover{stroke-width:31}
-.card{position:relative}.mc{position:absolute;bottom:8px;right:10px;display:flex;gap:4px;opacity:0;transition:.15s}.card:hover .mc{opacity:1}.mc b,.mc i{width:24px;height:24px;border-radius:7px;background:var(--on);display:grid;place-items:center;font-style:normal;font-size:12px;cursor:pointer;color:var(--mut)}.mc i{cursor:grab}.grid:not([data-g]) .mc{display:none}.card.dragging{opacity:.4}@media(hover:none){.mc{opacity:.7}}
+.card{position:relative}.mc{position:absolute;top:10px;right:10px;display:flex;gap:4px;opacity:0;transition:.15s}.card:hover>.mc{opacity:1}.mc b,.mc i{width:22px;height:22px;border-radius:7px;background:var(--on);display:grid;place-items:center;font-style:normal;font-size:12px;cursor:pointer;color:var(--mut)}.mc i{cursor:grab}.grid:not([data-g]) .mc{display:none}.card.dragging{opacity:.4}@media(hover:none){.mc{opacity:.7}}
 .co .ch{display:grid;grid-template-columns:200px 150px 1fr 1fr;gap:16px;align-items:center}
 .blk{position:relative;margin-bottom:14px}.blk>.grid,.blk>.card.big{margin:0}.mv{position:absolute;top:-17px;right:18px;display:flex;gap:4px;opacity:0;transition:.15s;z-index:3}.blk:hover>.mv{opacity:1}.mv b,.mv i{width:26px;height:26px;border-radius:8px;background:var(--glass);box-shadow:0 1px 6px #0002;display:grid;place-items:center;font-style:normal;font-size:13px;cursor:pointer;color:var(--mut)}.mv i{cursor:grab}.blk.dragging{opacity:.4}@media(hover:none){.mv{opacity:.75}}
 .hr{gap:0;margin-top:22px}.hs{padding:2px 28px;border-left:1px solid var(--line)}.hs:first-child{padding-left:0;border-left:0}.hs .cap{display:block;margin-bottom:8px}.hs b{font-size:clamp(26px,2.8vw,44px)}
 .seg{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.seg button{border:0;background:var(--inp);color:var(--ink);padding:8px 16px;border-radius:999px;font:500 13px "Onest",sans-serif;cursor:pointer;box-shadow:0 1px 6px #0001}.seg button.on{background:var(--ink);color:var(--card)}
-.ni{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1px solid var(--mut);color:var(--mut);font:italic 600 10px Georgia,serif;margin-left:8px;cursor:help;text-transform:none;letter-spacing:0;vertical-align:middle}#upd{cursor:help}
+.pop{position:fixed;z-index:30;max-width:300px;background:var(--tipbg);color:var(--ink);padding:12px 14px;border-radius:14px;box-shadow:0 10px 30px #0004;border:1px solid var(--line);font-size:13px;line-height:1.45;display:none}.ni{-webkit-tap-highlight-color:transparent;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1px solid var(--mut);color:var(--mut);font:italic 600 10px Georgia,serif;margin-left:8px;cursor:pointer;text-transform:none;letter-spacing:0;vertical-align:middle}#upd{cursor:pointer}
 .grid[data-g=kpi]{grid-template-columns:repeat(2,1fr)}@media(min-width:1500px){.grid[data-g=kpi]{grid-template-columns:repeat(4,1fr)}}@media(max-width:560px){.grid[data-g=kpi]{grid-template-columns:1fr}}
 .grid[data-g=stat],.grid[data-g=infl],.grid[data-g=fx],.grid[data-g=growth]{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-.sb{display:flex;border-radius:7px;overflow:hidden;background:var(--dbar)}.sb span{display:block;height:100%}.pm{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:center;margin:14px 0 6px}.big2{font-size:38px;font-weight:300;line-height:1.1}@media(max-width:760px){h2{min-height:0;margin-bottom:12px}.pm{grid-template-columns:1fr;gap:12px}.hs{padding:10px 14px;border-left:0}.hs:first-child{padding-left:14px}.dist{grid-template-columns:1fr;justify-items:center}.dr{grid-template-columns:1fr auto}.dbar{display:none}.dist>div:last-child{width:100%}.wrap{grid-template-columns:1fr;padding:16px 14px 90px;gap:16px}.logo,.set{display:none}nav{position:fixed;left:12px;right:12px;bottom:12px;display:flex;z-index:5}nav a{flex:1;text-align:center;padding:10px 4px}.hero{padding:20px}.hr{grid-template-columns:1fr 1fr}.hs b{font-size:26px}.hs small{white-space:normal}.cols{grid-template-columns:1fr}}
-</style></head><body><div class="tip" id="tip"></div><button id="th" aria-label="Тема"></button>
+.rcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px}.sb{display:flex;border-radius:7px;overflow:hidden;background:var(--dbar)}.sb span{display:block;height:100%}.pm{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:center;margin:14px 0 6px}.big2{font-size:38px;font-weight:300;line-height:1.1}@media(max-width:760px){h2{min-height:0;margin-bottom:12px}.pm{grid-template-columns:1fr;gap:12px}.hs{padding:10px 14px;border-left:0}.hs:first-child{padding-left:14px}.dist{grid-template-columns:1fr;justify-items:center}.dr{grid-template-columns:1fr auto}.dbar{display:none}.dist>div:last-child{width:100%}.wrap{grid-template-columns:1fr;padding:16px 14px 90px;gap:16px}.logo,.set{display:none}nav{position:fixed;left:12px;right:12px;bottom:12px;display:flex;z-index:5}nav a{flex:1;text-align:center;padding:10px 4px}.hero{padding:20px}.hr{grid-template-columns:1fr 1fr}.hs b{font-size:26px}.hs small{white-space:normal}.cols{grid-template-columns:1fr}}
+</style></head><body><div class="tip" id="tip"></div><div class="pop" id="pop"></div><div id="tools"><select id="cur" aria-label="Currency"><option>USD</option><option>EUR</option><option>BYN</option><option>RUB</option></select><button id="lg" aria-label="Language">EN</button><button id="th" aria-label="Тема"></button></div>
 <div class="wrap"><aside><div class="logo">zp</div><nav id="nav"><a data-v="home">Главная</a><a data-v="cos">Компании</a><a data-v="years">Годы</a><a data-v="career">Карьера</a><a data-v="market">Курсы и инфляция</a></nav>
 <div class="set">Настройки<label>Часов в месяц<input id="h" type="number" step="0.1"></label><label>Дней в месяц<input id="d" type="number" step="1"></label><label>Инфляция (запасная), %<input id="i" type="number" step="0.1"></label><div id="upd" style="margin-top:10px"></div><div id="rst" style="margin-top:8px;cursor:pointer;text-decoration:underline">Сбросить порядок блоков</div></div></aside>
 <main id="main"><div class="card">Загружаю данные…</div></main></div>
 <script src="calc.js"></script><script src="config.js"></script>
 <script>
+let lang=localStorage.lang||'ru';const LOC=()=>lang=='en'?'en-US':'ru-RU',LOCD=()=>lang=='en'?'en-GB':'ru-RU',DS=()=>lang=='en'?'.':',',SYMS={USD:'$',EUR:'€',BYN:'Br',RUB:'₽'},sym=()=>SYMS[st.cur]||'$';
 const $=s=>document.querySelector(s),COL=['#6c4de0','#3aa6e8','#f0a35e','#e4607a','#4fbf8f','#9aa0b4'],MN=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-const n0=x=>x==null?'—':Math.round(x).toLocaleString('ru-RU'),$$=x=>x==null?'—':n0(x)+'\u00a0$',n2=x=>x==null?'—':x.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}),pc=x=>x==null?'—':(x>0?'+':'')+(x*100).toFixed(1).replace('.',',')+'%',gc=x=>x==null?'':x>0?'up':'dn';
-const fm=x=>String(Math.round(x*10)/10).replace('.',','),mname=m=>MN[m.idx%12]+' '+Math.floor(m.idx/12),dt=d=>d.toLocaleDateString('ru-RU');
-let R,D,view='home',per='12',sel=null,hide=new Set(),ex=new Set(),st={h:+localStorage.h||168.7,i:+localStorage.i||3,d:+localStorage.d||21};
+const n0=x=>x==null?'—':Math.round(x).toLocaleString(LOC()),$$=x=>x==null?'—':n0(x)+'\u00a0'+sym(),n2=x=>x==null?'—':x.toLocaleString(LOC(),{minimumFractionDigits:2,maximumFractionDigits:2}),pc=x=>x==null?'—':(x>0?'+':'')+(x*100).toFixed(1).replace('.',DS())+'%',gc=x=>x==null?'':x>0?'up':'dn';
+const fm=x=>String(Math.round(x*10)/10).replace('.',DS()),mname=m=>MN[m.idx%12]+' '+Math.floor(m.idx/12),dt=d=>d.toLocaleDateString(LOCD());
+let R,D,view='home',per='12',sel=null,hide=new Set(),ex=new Set(),st={h:+localStorage.h||168.7,i:+localStorage.i||3,d:+localStorage.d||21,cur:localStorage.cur||'USD'};
 $('#h').value=st.h;$('#i').value=st.i;$('#d').value=st.d;
 ['h','i','d'].forEach(k=>$('#'+k).onchange=e=>{st[k]=+e.target.value;localStorage[k]=st[k];calc();draw()});
-$('#nav').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;draw()}};
+$('#nav').onclick=e=>{if(e.target.dataset.v){MKerr=null;view=e.target.dataset.v;draw()}};
 const card=(ic,l,v,s,c='')=>`<div class="card" data-cid="${l}"><span class="mc"><b data-mc="-1">‹</b><b data-mc="1">›</b><i class="gc" title="Перетащить">⠿</i></span><div class="cap"><span class="ic">${ic}</span>${l}</div><div class="v ${c}">${v}</div><div class="s">${s||''}</div></div>`;
 const FXID={USD:431,EUR:451,RUB:456},SC={USD:1,EUR:1,RUB:100},dayOf=d=>Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5,iso=d=>new Date(d*864e5).toISOString().slice(0,10);
 let fx=()=>1,fxUsed=false;
@@ -62,19 +63,25 @@ async function fxArr(need,minD){const today=dayOf(new Date()),lo=minD,N=today+62
   for(let i=0;i<N;i++){while(k<keys.length&&keys[k]<=lo+i){last=ch.d[keys[k]];k++}arr[i]=last}
   const f=arr.find(v=>v>0);for(let i=0;i<N&&!arr[i];i++)arr[i]=f;A[c]=arr}
  return{A,lo,N,lastD}}
-async function getFx(R){const used=new Set(R.map(r=>r.cur));fxUsed=false;if(used.size==1&&used.has('USD'))return()=>1;fxUsed=true;
- const need=['USD',...[...used].filter(c=>c!='USD'&&c!='BYN')],minD=Math.min(...R.flatMap(r=>[r.s,r.e,r.pay].filter(Boolean).map(dayOf))),{A,lo,N}=await fxArr([...new Set(need)],minD);
- const byn=(c,d)=>c=='BYN'?1:A[c][Math.min(Math.max(d-lo,0),N-1)];return(c,d)=>c=='USD'?1:byn(c,d)/byn('USD',d)}
+async function getFx(R){const used=new Set(R.map(r=>r.cur)),T0=st.cur;fxUsed=false;if(used.size==1&&used.has(T0))return()=>1;fxUsed=true;
+ const need=[...new Set([...used,T0])].filter(c=>c!='BYN'),minD=Math.min(...R.flatMap(r=>[r.s,r.e,r.pay].filter(Boolean).map(dayOf))),{A,lo,N}=await fxArr(need,minD);
+ const byn=(c,d)=>c=='BYN'?1:A[c][Math.min(Math.max(d-lo,0),N-1)];return(c,d)=>c==T0?1:byn(c,d)/byn(T0,d)}
 const CW=()=>Math.max(520,Math.min(2000,(($('#main')||{}).clientWidth||772)-52));
 let cpi=i=>Math.pow(1+st.i/100,i/12),cpiSrc='ручная ставка',cpiMeta={src:'ручная ставка',monthly:false},loadedAt=null;
-function mkCpi(p){p.sort((a,b)=>a[0]-b[0]);const f=p[0],l=p[p.length-1],g=()=>1+st.i/100;
+function mkCpi(p,tail){p.sort((a,b)=>a[0]-b[0]);const f=p[0],l=p[p.length-1],g=()=>1+(tail!=null?tail:st.i/100);
  return i=>{if(i<=f[0])return f[1]/Math.pow(g(),(f[0]-i)/12);if(i>=l[0])return l[1]*Math.pow(g(),(i-l[0])/12);let k=0;while(p[k+1][0]<i)k++;const a=p[k],b=p[k+1];return a[1]*Math.pow(b[1]/a[1],(i-a[0])/(b[0]-a[0]))}}
 async function fredCpi(){const r=await fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL&cosd=2015-01-01');if(!r.ok)throw 0;const p=(await r.text()).trim().split('\n').slice(1).map(l=>l.split(',')).map(([d,v])=>[+d.slice(0,4)*12+(+d.slice(5,7)-1),parseFloat(v)]).filter(x=>x[1]>0);if(p.length<12)throw 0;return p}
 async function blsCpi(){const y=new Date().getFullYear(),r=await fetch(`https://api.bls.gov/publicAPI/v1/timeseries/data/CUUR0000SA0?startyear=${y-9}&endyear=${y}`);if(!r.ok)throw 0;const d=(await r.json()).Results.series[0].data,p=d.filter(x=>/^M(0[1-9]|1[0-2])$/.test(x.period)).map(x=>[+x.year*12+(+x.period.slice(1)-1),parseFloat(x.value)]);if(p.length<12)throw 0;return p}
-async function wbCpi(){const r=await fetch('https://api.worldbank.org/v2/country/USA/indicator/FP.CPI.TOTL.ZG?format=json&per_page=100&date=2010:'+new Date().getFullYear());if(!r.ok)throw 0;const j=(await r.json())[1].filter(x=>x.value!=null).map(x=>[+x.date,x.value]).sort((a,b)=>a[0]-b[0]);if(!j.length)throw 0;let q=1;const p=[[(j[0][0]-1)*12+6,1]];j.forEach(([y,v])=>{q*=1+v/100;p.push([y*12+6,q])});return p}
-async function loadCpi(){let c;try{c=JSON.parse(localStorage.cpi2)}catch(e){}
- if(!c||Date.now()-c.t>6048e5){let n=null;try{n={pts:await fredCpi(),src:'США CPI (FRED), помесячно'}}catch(e){try{n={pts:await blsCpi(),src:'США CPI (BLS), помесячно'}}catch(e1){try{n={pts:await wbCpi(),src:'США CPI (World Bank), по годам'}}catch(e2){}}}if(n){c={t:Date.now(),...n};localStorage.cpi2=JSON.stringify(c)}}
- if(c&&c.pts&&c.pts.length>1){cpi=mkCpi(c.pts);cpiSrc=c.src;cpiMeta={src:c.src,t:c.t,monthly:/помесячно/.test(c.src),pts:c.pts,last:Math.max(...c.pts.map(p=>p[0]))}}else{cpi=i=>Math.pow(1+st.i/100,i/12);cpiSrc='ручная ставка '+st.i+'%';cpiMeta={src:'ручная ставка',monthly:false}}}
+async function wbCpi(cc){const r=await fetch('https://api.worldbank.org/v2/country/'+cc+'/indicator/FP.CPI.TOTL.ZG?format=json&per_page=100&date=2010:'+new Date().getFullYear());if(!r.ok)throw 0;const j=(await r.json())[1].filter(x=>x.value!=null).map(x=>[+x.date,x.value]).sort((a,b)=>a[0]-b[0]);if(!j.length)throw 0;let q=1;const p=[[(j[0][0]-1)*12+6,1]];j.forEach(([y,v])=>{q*=1+v/100;p.push([y*12+6,q])});return p}
+const GEN={USD:'США',EUR:'еврозоны',BYN:'Беларуси',RUB:'России'},CN={USD:'США',EUR:'Еврозона',BYN:'Беларусь',RUB:'Россия'},WBC={USD:'USA',EUR:'EMU',BYN:'BLR',RUB:'RUS'};
+async function loadCpi(){const c0=st.cur,KEY='cpi3_'+c0;let c;try{c=JSON.parse(localStorage[KEY])}catch(e){}
+ if(!c||Date.now()-c.t>6048e5){let n=null;
+  if(c0=='USD'){try{n={pts:await fredCpi(),src:'США CPI (FRED), помесячно'}}catch(e){try{n={pts:await blsCpi(),src:'США CPI (BLS), помесячно'}}catch(e1){}}}
+  if(!n){try{n={pts:await wbCpi(WBC[c0]),src:CN[c0]+' CPI (World Bank), по годам'}}catch(e2){}}
+  if(n){c={t:Date.now(),...n};localStorage[KEY]=JSON.stringify(c)}}
+ if(c&&c.pts&&c.pts.length>1){const monthly=/помесячно/.test(c.src),P=c.pts.slice().sort((x,y)=>x[0]-y[0]),L=P[P.length-1],pv=monthly?P.find(p=>p[0]==L[0]-12):P[P.length-2],tail=pv&&pv[1]>0?L[1]/pv[1]-1:null;
+  cpi=mkCpi(P,tail);cpiSrc=c.src;cpiMeta={src:c.src,t:c.t,monthly,pts:c.pts,last:L[0],tail}}
+ else{cpi=i=>Math.pow(1+st.i/100,i/12);cpiSrc='ручная ставка '+st.i+'%';cpiMeta={src:'ручная ставка',monthly:false}}}
 function calc(){D=Calc.compute(R,{hours:st.h,infl:st.i/100,fx,cpi})}
 function range(){const M=D.M;if(per=='all'||per=='now')return M;if(per=='12')return M.slice(-12);return M.filter(m=>Math.floor(m.idx/12)==+per)}
 function nice(v){const e=Math.pow(10,Math.floor(Math.log10(v/4))),f=v/4/e;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e}
@@ -85,7 +92,7 @@ function chart(ms,vis,main,k0){const W=CW(),H=main?250:200,pl=42,pb=22,pt=10,tot
   const tp=main?`<b>${mname(m)}</b><br>${$$(m.tot)}${m.prT>0?'<br>из них премии '+$$(m.prT):''}`:`<b>${mname(m)}</b><br>${$$(m.s[k0]+m.p[k0])}${m.p[k0]>0?'<br>из них премия '+$$(m.p[k0]):''}`;
   g+=`<rect ${main?`data-i="${m.i}"`:''} data-tip="${tp.replace(/"/g,'&quot;')}" x="${x}" y="0" width="${bw}" height="${H-pb}" fill="${main&&sel==m.i?'#6c4de022':'transparent'}"/>`});
  return`<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`}
-const pct=x=>(x*100).toFixed(1).replace('.',',')+'%';
+const pct=x=>(x*100).toFixed(1).replace('.',DS())+'%';
 function dist(ms){const lab=per=='all'||per=='now'?'за всё время':per=='12'?'за последние 12 месяцев':'за '+per+' год';
  const C=D.C.map(c=>({c,t:ms.reduce((a,m)=>a+m.s[c.k]+m.p[c.k],0),p:ms.reduce((a,m)=>a+m.p[c.k],0)})).filter(x=>x.t>0.005).sort((a,b)=>b.t-a.t),T=C.reduce((a,x)=>a+x.t,0);
  if(!T)return`<div class="card big"><div class="cap">Вклад компаний</div><div class="s" style="margin-top:10px">Нет дохода за выбранный период</div></div>`;
@@ -94,11 +101,11 @@ function dist(ms){const lab=per=='all'||per=='now'?'за всё время':per=
  return`<div class="card big"><div class="cap">Вклад компаний, ${lab}</div><div class="dist"><svg viewBox="0 0 180 180" width="180" height="180">${arcs}<text x="90" y="86" text-anchor="middle" style="font-size:17px;font-weight:700;fill:var(--ink)">${$$(T)}</text><text x="90" y="104" text-anchor="middle" style="font-size:10px">всего</text></svg>
  <div>${C.map(x=>`<div class="dr"><div><i class="dot" style="background:${COL[x.c.k%6]}"></i><b>${x.c.name}</b></div><div class="dbar"><span style="width:${x.t/T*100}%;background:${COL[x.c.k%6]}"></span></div><div class="r"><b>${$$(x.t)}</b> · ${pct(x.t/T)}${x.p>0.005?`<small>в т.ч. премии ${$$(x.p)}</small>`:''}</div></div>`).join('')}</div></div></div>`}
 const plab=()=>per=='all'||per=='now'?'за всё время':per=='12'?'за последние 12 месяцев':'за '+per+' год';
-function fxEff(ms){const ref=dayOf(new Date(Math.floor(ms[0].idx/12),ms[0].idx%12,1)),today=dayOf(new Date()),O={hours:st.h,infl:st.i/100},cs=[...new Set(R.map(r=>r.cur))].filter(c=>c!='USD'),act=ms.reduce((a,m)=>a+m.tot,0),
+function fxEff(ms){const ref=dayOf(new Date(Math.floor(ms[0].idx/12),ms[0].idx%12,1)),today=dayOf(new Date()),O={hours:st.h,infl:st.i/100},cs=[...new Set(R.map(r=>r.cur))].filter(c=>c!=st.cur),act=ms.reduce((a,m)=>a+m.tot,0),
  run=f=>{const d=Calc.compute(R,{...O,fx:f});return ms.reduce((a,m)=>a+d.M[m.i].tot,0)},cons=run((c,d)=>fx(c,ref));
  return{act,cons,eff:act-cons,by:cs.map(c=>({c,eff:act-run((x,d)=>x==c?fx(x,ref):fx(x,d)),r0:fx(c,ref),r1:fx(c,today)})).filter(x=>Math.abs(x.eff)>0.005)}}
 function fxBlock(ms){if(!fxUsed||!ms.length)return'';const e=fxEff(ms);if(!e.by.length)return'';const p=e.cons?e.eff/e.cons:null,sg=x=>(x>0?'+':'')+$$(x);
- return`<div class="card big"><div class="cap">Влияние курсов валют, ${plab()}${ni('Эффект = доход по реальным курсам минус тот же доход по курсам на начало периода. Плюс: курс помог, минус: отнял.')}</div><div class="grid" data-g="fx" style="margin:10px 0">${card('$','Доход фактически',$$(e.act),'по курсам НБ РБ на каждую дату')}${card('=','При курсах на начало периода',$$(e.cons),'если бы курсы не менялись')}${card('±','Эффект курсов',sg(e.eff),p==null?'':pc(p)+' к доходу',gc(e.eff))}</div>
+ return`<div class="card big"><div class="cap">Влияние курсов валют, ${plab()}${ni('Эффект = доход по реальным курсам минус тот же доход по курсам на начало периода. Плюс: курс помог, минус: отнял.')}</div><div class="grid" data-g="fx" style="margin:10px 0">${card(sym(),'Доход фактически',$$(e.act),'по курсам НБ РБ на каждую дату')}${card('=','При курсах на начало периода',$$(e.cons),'если бы курсы не менялись')}${card('±','Эффект курсов',sg(e.eff),p==null?'':pc(p)+' к доходу',gc(e.eff))}</div>
  ${e.by.map(x=>`<div class="dr" style="grid-template-columns:90px 1fr 150px"><div><b>${x.c}</b></div><div class="s">1 $ = ${n2(1/x.r0)} ${x.c} → ${n2(1/x.r1)} ${x.c}: ${x.c} ${x.r1>=x.r0?'укрепился':'ослаб'} на ${pct(Math.abs(x.r1/x.r0-1))}</div><div class="r"><b class="${gc(x.eff)}">${sg(x.eff)}</b></div></div>`).join('')}</div>`}
 function premBlock(ms){const T=ms.reduce((a,m)=>a+m.tot,0),P=ms.reduce((a,m)=>a+m.prT,0);if(!T)return'';
  const C=D.C.map(c=>({c,t:ms.reduce((a,m)=>a+m.s[c.k]+m.p[c.k],0),p:ms.reduce((a,m)=>a+m.p[c.k],0)})).filter(x=>x.t>0.005).sort((a,b)=>b.t-a.t),
@@ -108,12 +115,12 @@ function premBlock(ms){const T=ms.reduce((a,m)=>a+m.tot,0),P=ms.reduce((a,m)=>a+
  ${C.map(x=>`<div class="dr" style="grid-template-columns:150px 1fr 190px"><div><i class="dot" style="background:${COL[x.c.k%6]}"></i><b>${x.c.name}</b></div>${bar(x.p,x.t,8)}<div class="r"><b>${pct(x.p/x.t)}</b><small>${$$(x.p)} из ${$$(x.t)}</small></div></div>`).join('')}</div>`}
 function growthBlock(){const M=D.M,cur=D.cur,cy=Math.floor(cur/12),sg=x=>(x>0?'+':'')+$$(x),S=(a,b)=>M.filter(m=>m.idx>=a&&m.idx<=b).reduce((s,m)=>s+m.tot,0),
  cmp=(lab,pl,a,b,a0,b0)=>{const c=S(a,b),p=S(a0,b0);if(!(p>0))return null;const g=c/p-1,r=cpi((a+b)/2)/cpi((a0+b0)/2);return{lab,pl,c,p,d:c-p,g,rg:(1+g)/r-1,dr:c-p*r}},
- pr=cur%12==0?'янв':'янв–'+MN[cur%12],
+ pr=cur%12==0?MN[0]:MN[0]+'–'+MN[cur%12],
  rows=[cmp('Последние 12 мес.','пред. 12 мес.',cur-11,cur,cur-23,cur-12),cmp(`${cy} (${pr})`,`${cy-1} (${pr})`,cy*12,cur,(cy-1)*12,cur-12)];
  for(let y=cy-1;y>Math.floor(D.first/12);y--)rows.push(cmp(String(y),String(y-1),y*12,y*12+11,(y-1)*12,(y-1)*12+11));
  const R2=rows.filter(Boolean),ytd=R2.find(x=>x.lab.startsWith(cy+' ')),l=D.l12;
- return`<div class="card big"><div class="cap">Рост дохода${ni('Сравниваются одинаковые отрезки года: например, январь–октябрь этого года с январём–октябрём прошлого. «С учётом инфляции»: доход прошлого периода пересчитан в цены текущего (в скобках разница в долларах). Инфляция: '+cpiSrc)}</div>
- <div class="grid" data-g="growth" style="margin:12px 0">${card('%','Реальный рост, 12 мес.',pc(l.r),'номинально '+pc(l.g),gc(l.r))}${card('↗','Реальный рост в год',pc(D.cagrR),'номинально '+pc(D.cagr)+' (CAGR)',gc(D.cagrR))}${ytd?card('△',`${cy} к ${cy-1}, тот же период`,pc(ytd.rg),sg(ytd.d)+' · номинально '+pc(ytd.g),gc(ytd.rg)):''}</div>
+ return`<div class="card big"><div class="cap">Рост дохода${ni('Сравниваются одинаковые отрезки года: например, январь–октябрь этого года с январём–октябрём прошлого. «С учётом инфляции»: доход прошлого периода пересчитан в цены текущего (в скобках разница в сумме). Инфляция: '+cpiSrc+' «Среднегодовой рост» — единый годовой процент, при котором за те же годы получился бы такой же итог (сложный процент).')}</div>
+ <div class="grid" data-g="growth" style="margin:12px 0">${card('%','Реальный рост, 12 мес.',pc(l.r),'номинально '+pc(l.g),gc(l.r))}${card('↗','Среднегодовой рост',pc(D.cagrR),'номинально '+pc(D.cagr),gc(D.cagrR))}${ytd?card('△',`${cy} к ${cy-1}, тот же период`,pc(ytd.rg),sg(ytd.d)+' · номинально '+pc(ytd.g),gc(ytd.rg)):''}</div>
  ${R2.length?`<div style="overflow-x:auto"><table><tr><th>Период</th><th>Доход</th><th>Сравнение с</th><th>Доход</th><th>Изменение</th><th>Изменение, %</th><th>С учётом инфляции</th></tr>${R2.map(x=>`<tr><td><b>${x.lab}</b></td><td>${$$(x.c)}</td><td>${x.pl}</td><td>${$$(x.p)}</td><td class="${gc(x.d)}">${sg(x.d)}</td><td class="${gc(x.g)}">${pc(x.g)}</td><td class="${gc(x.rg)}">${pc(x.rg)} <span class="s">(${sg(x.dr)})</span></td></tr>`).join('')}</table></div>`:'<div class="s">Для сравнения нужен хотя бы год данных.</div>'}</div>`}
 function home(){const l=D.l12,A=D.all,dd=st.d,yrs=D.ys.map(s=>s.y),ms=range(),m=sel!=null?D.M[sel]:null,dv=x=>x==null?null:x/dd;
  const o=[['now','Сейчас'],['12','12 месяцев'],['all','Всё время'],...yrs.slice().reverse().map(y=>[String(y),String(y)])].map(([v,t])=>`<button class="${String(v)==per?'on':''}" data-p="${v}">${t}</button>`).join('');
@@ -121,26 +128,26 @@ function home(){const l=D.l12,A=D.all,dd=st.d,yrs=D.ys.map(s=>s.y),ms=range(),m=
  const act=D.C.filter(c=>ms.some(x=>x.s[c.k]+x.p[c.k]>0)),hasP=ms.some(x=>x.prT>0);
  const hs=(lab,v,al)=>`<div class="hs"><span class="cap">${lab}</span><b>${v}</b><small>${al}</small></div>`;
  const L=[],B=(id,x)=>{L.push({id,html:x});return''},bestC=D.C.reduce((a,c)=>c.t>a.t?c:a,D.C[0]),bestY=D.ys.reduce((a,s)=>s.t>a.t?s:a,D.ys[0]),sr=R.filter(r=>!r.p),maxS=sr.reduce((a,r)=>uu(r)>uu(a)?r:a,sr[0]),Mx=D.M,th=D.rec.tot*.97;let ra=D.rec.i,rb=D.rec.i;while(ra>0&&Mx[ra-1].tot>=th)ra--;while(rb<Mx.length-1&&Mx[rb+1].tot>=th)rb++;
- const html=`<h2>Обзор</h2>${B('hero',`<div class="hero"><div class="seg">${o}${now?'<span class="s" style="margin-left:10px">без премий</span>':''}</div><div class="hr">${hs('в час',n2(S.hr)+'\u00a0$',now?'12 мес.: '+n2(l.hr):'сейчас: '+n2(D.rateNow))}${hs('в день',$$(dv(S.am)),now?'12 мес.: '+$$(dv(l.am)):'сейчас: '+$$(dv(D.salNow)))}${hs('в месяц',$$(S.am),now?'12 мес.: '+$$(l.am):'сейчас: '+$$(D.salNow))}${hs('в год',$$(S.ay),now?'12 мес.: '+$$(l.ay):'сейчас: '+$$(D.salNow*12))}</div></div>`)}${B('kpi',`<div class="grid" data-g="kpi">${card('⌛','Общий стаж',expStr(A.mo),'с '+mname(D.M[0]))}${card('∑','Всего',$$(A.t),'за '+fm(A.mo)+' мес. работы')}${card('$','Сейчас',$$(D.salNow),'в месяц, ставка '+n2(D.rateNow)+' $/ч')}${card('★','Самый долгий стаж',D.longest.name,fm(D.longest.mo)+' мес.')}${card('◎','Принесла больше всего',bestC.name,$$(bestC.t)+' · '+pct(bestC.share))}${card('↑','Максимальная зарплата',$$(uu(maxS)),maxS.c+', с '+dt(maxS.s))}${card('▲','Рекорд месяца',$$(D.rec.tot),ra==rb?mname(D.rec):mname(D.M[ra])+' — '+mname(D.M[rb])+' · '+(rb-ra+1)+' мес. подряд')}${card('◆','Лучший год',String(bestY.y),$$(bestY.t))}</div>`)}${B('month',`<div class="card big"><div class="cap">Доход по месяцам</div><div class="leg" style="margin:8px 0">${act.map(c=>`<span data-k="${c.k}" style="opacity:${hide.has(c.k)?.4:1}"><i class="dot" style="background:${COL[c.k%6]}"></i>${c.name}</span>`).join('')}${hasP?`<span style="cursor:default"><i class="dot" style="background:#aaa;opacity:.5"></i>премии (светлее)</span>`:''}</div>${chart(ms,D.C.map((_,k)=>!hide.has(k)),true)}
+ const html=`<h2>Обзор</h2>${B('hero',`<div class="hero"><div class="seg">${o}${now?'<span class="s" style="margin-left:10px">без премий</span>':''}</div><div class="hr">${hs('в час',n2(S.hr)+'\u00a0'+sym(),now?'12 мес.: '+n2(l.hr):'сейчас: '+n2(D.rateNow))}${hs('в день',$$(dv(S.am)),now?'12 мес.: '+$$(dv(l.am)):'сейчас: '+$$(dv(D.salNow)))}${hs('в месяц',$$(S.am),now?'12 мес.: '+$$(l.am):'сейчас: '+$$(D.salNow))}${hs('в год',$$(S.ay),now?'12 мес.: '+$$(l.ay):'сейчас: '+$$(D.salNow*12))}</div></div>`)}${B('kpi',`<div class="grid" data-g="kpi">${card('⌛','Общий стаж',expStr(A.mo),'с '+mname(D.M[0]))}${card('∑','Всего',$$(A.t),'за '+fm(A.mo)+' мес. работы')}${card(sym(),'Сейчас',$$(D.salNow),'в месяц, ставка '+n2(D.rateNow)+' '+sym()+'/ч')}${card('★','Самый долгий стаж',D.longest.name,fm(D.longest.mo)+' мес.')}${card('◎','Принесла больше всего',bestC.name,$$(bestC.t)+' · '+pct(bestC.share))}${card('↑','Максимальная зарплата',$$(uu(maxS)),maxS.c+', с '+dt(maxS.s))}${card('▲','Рекорд месяца',$$(D.rec.tot),ra==rb?mname(D.rec):mname(D.M[ra])+' — '+mname(D.M[rb])+' · '+(rb-ra+1)+' мес. подряд')}${card('◆','Лучший год',String(bestY.y),$$(bestY.t))}</div>`)}${B('month',`<div class="card big"><div class="cap">Доход по месяцам</div><div class="leg" style="margin:8px 0">${act.map(c=>`<span data-k="${c.k}" style="opacity:${hide.has(c.k)?.4:1}"><i class="dot" style="background:${COL[c.k%6]}"></i>${c.name}</span>`).join('')}${hasP?`<span style="cursor:default"><i class="dot" style="background:#aaa;opacity:.5"></i>премии (светлее)</span>`:''}</div>${chart(ms,D.C.map((_,k)=>!hide.has(k)),true)}
  ${m?`<div class="s" id="det"><b>${mname(m)}:</b> ${D.C.map(c=>`${c.name} ${n0(m.s[c.k])}${m.p[c.k]>0?' + премия '+n0(m.p[c.k]):''}`).filter((t,k)=>m.s[k]||m.p[k]).join(' · ')} → <b>${$$(m.tot)}</b></div>`:''}</div>`)}${B('growth',growthBlock())}${B('dist',dist(ms))}${B('prem',premBlock(ms))}${B('fx',fxBlock(ms))}`;return'<h2>Обзор</h2>'+wrap('home',L)}
-function det(c){const u=r=>r.a*D.fx(r.cur,dayOf(r.s)),am=r=>r.cur=='USD'?$$(r.a):n0(r.a)+'\u00a0'+r.cur+' (≈'+$$(u(r))+')',sr=R.filter(r=>r.c==c.name&&!r.p).sort((a,b)=>a.s-b.s),pr=R.filter(r=>r.c==c.name&&r.p).sort((a,b)=>a.s-b.s),ix=d=>d.getFullYear()*12+d.getMonth(),
+function det(c){const u=r=>r.a*D.fx(r.cur,dayOf(r.s)),am=r=>r.cur==st.cur?$$(r.a):n0(r.a)+'\u00a0'+r.cur+' (≈'+$$(u(r))+')',sr=R.filter(r=>r.c==c.name&&!r.p).sort((a,b)=>a.s-b.s),pr=R.filter(r=>r.c==c.name&&r.p).sort((a,b)=>a.s-b.s),ix=d=>d.getFullYear()*12+d.getMonth(),
  ms=D.M.filter(m=>m.idx>=ix(c.from)&&m.idx<=(c.open?D.cur:ix(c.to)));
- return`<div class="det"><div class="grid" style="margin-top:0">${[['Месяцев',fm(c.mo)],['Зарплата',$$(c.sal)],['Премии',$$(c.pr)],['Доля премий',pct(c.t?c.pr/c.t:0)],['Доля дохода',(c.share*100).toFixed(1).replace('.',',')+'%'],['В день',$$(c.am/st.d)],['В час',n2(c.hr)+'\u00a0$']].map(([l,v])=>`<div><div class="cap">${l}</div><div class="v" style="font-size:20px">${v}</div></div>`).join('')}</div>
+ return`<div class="det"><div class="grid" style="margin-top:0">${[['Месяцев',fm(c.mo)],['Зарплата',$$(c.sal)],['Премии',$$(c.pr)],['Доля премий',pct(c.t?c.pr/c.t:0)],['Доля дохода',(c.share*100).toFixed(1).replace('.',DS())+'%'],['В день',$$(c.am/st.d)],['В час',n2(c.hr)+'\u00a0'+sym()]].map(([l,v])=>`<div><div class="cap">${l}</div><div class="v" style="font-size:20px">${v}</div></div>`).join('')}</div>
  ${chart(ms,D.C.map((_,k)=>k==c.k),false,c.k)}
  <div class="cols"><div><div class="cap">Зарплата по периодам</div><table>${sr.map((r,i)=>{const g=i&&u(sr[i-1])>0?u(r)/u(sr[i-1])-1:null;return`<tr><td>${dt(r.s)} — ${r.e?dt(r.e):'н.в.'}</td><td>${am(r)}</td><td class="${gc(g)}">${pc(g)}</td></tr>`}).join('')}</table></div>
  <div><div class="cap">Премии</div>${pr.length?`<table>${pr.map(r=>`<tr><td>${r.e?'за '+dt(r.s)+' — '+dt(r.e):dt(r.s)+' (за год до даты)'}</td><td>${am(r)}</td></tr>`).join('')}</table>`:'<div class="s" style="margin-top:10px">Премий не было</div>'}</div></div></div>`}
-function cos(){return`<h2>Компании</h2><div class="grid" style="grid-template-columns:1fr">${D.C.slice().sort(recent).map(c=>{const o=ex.has(c.k),col=COL[c.k%6];return`<div class="card co ${o?'open':''}" style="border-color:${col}55"><div class="ch" data-co="${c.k}"><div class="cap"><i class="dot" style="background:${col}"></i>${c.name}<span class="chev">${o?'▴':'▾'}</span></div><div class="v">${$$(c.t)}</div><div class="s">${dt(c.from)} — ${c.open?'н.в.':dt(c.to)} · ${fm(c.mo)} мес.<br>${(c.share*100).toFixed(1).replace('.',',')}% дохода · премии ${$$(c.pr)} (${pct(c.t?c.pr/c.t:0)})</div><div class="s" style="margin-top:10px;color:var(--ink)">${$$(c.am)} в мес. · ${$$(c.ay)} в год · ${n2(c.hr)} $/ч</div></div>${o?det(c):''}</div>`}).join('')}</div>`}
-function years(){const l=D.l12,p=D.p12;return`<h2>Годы${ni('Рост считается по среднему доходу в месяц. Нулевые периоды в начале пропускаются, база: первый год с доходом. Реальный рост учитывает инфляцию. Нажмите на строку, чтобы открыть период на главной.')}</h2><div class="grid">${card('%','12 мес. к предыдущим',pc(l.r),'номинально: '+pc(l.g),gc(l.r))}${card('Ø','Средний рост год к году',pc(D.avgR),'номинально: '+pc(D.avgG),gc(D.avgR))}${card('↗','CAGR',pc(D.cagrR),'номинально: '+pc(D.cagr),gc(D.cagrR))}</div>
+function cos(){return`<h2>Компании</h2><div class="grid" style="grid-template-columns:1fr">${D.C.slice().sort(recent).map(c=>{const o=ex.has(c.k),col=COL[c.k%6];return`<div class="card co ${o?'open':''}" style="border-color:${col}55"><div class="ch" data-co="${c.k}"><div class="cap"><i class="dot" style="background:${col}"></i>${c.name}<span class="chev">${o?'▴':'▾'}</span></div><div class="v">${$$(c.t)}</div><div class="s">${dt(c.from)} — ${c.open?'н.в.':dt(c.to)} · ${fm(c.mo)} мес.<br>${(c.share*100).toFixed(1).replace('.',DS())}% дохода · премии ${$$(c.pr)} (${pct(c.t?c.pr/c.t:0)})</div><div class="s" style="margin-top:10px;color:var(--ink)">${$$(c.am)} в мес. · ${$$(c.ay)} в год · ${n2(c.hr)} ${sym()}/ч</div></div>${o?det(c):''}</div>`}).join('')}</div>`}
+function years(){const l=D.l12,p=D.p12;return`<h2>Годы${ni('Рост считается по среднему доходу в месяц. Нулевые периоды в начале пропускаются, база: первый год с доходом. Реальный рост учитывает инфляцию. Нажмите на строку, чтобы открыть период на главной.'+' «Среднегодовой рост» — единый годовой процент, при котором за те же годы получился бы такой же итог (сложный процент).')}</h2><div class="grid">${card('%','12 мес. к предыдущим',pc(l.r),'номинально: '+pc(l.g),gc(l.r))}${card('Ø','Средний рост год к году',pc(D.avgR),'номинально: '+pc(D.avgG),gc(D.avgR))}${card('↗','Среднегодовой рост',pc(D.cagrR),'номинально: '+pc(D.cagr),gc(D.cagrR))}</div>
  <div class="card big"><table><tr><th>Период</th><th>Мес.</th><th>Заработано</th><th>Доля премий</th><th>В месяц</th><th>В час</th><th>Рост</th><th>Реальный</th></tr>
  ${[['12 мес.',l,'12'],['Пред. 12',p,''],...D.ys.slice().reverse().map(s=>[s.y,s,s.y])].map(([n,s,k])=>`<tr class="${k?'y':''}" data-y="${k}"><td><b>${n}</b></td><td>${fm(s.mo)}</td><td>${$$(s.t)}</td><td>${s.t>0?pct(s.p/s.t):'—'}</td><td>${$$(s.am)}</td><td>${n2(s.hr)}</td><td class="${gc(s.g)}">${n=='Пред. 12'?'':pc(s.g)}</td><td class="${gc(s.r)}">${n=='Пред. 12'?'':pc(s.r)}</td></tr>`).join('')}</table>
  </div>`}
-const uu=r=>r.a*D.fx(r.cur,dayOf(r.s)),amx=r=>r.cur=='USD'?$$(r.a):n0(r.a)+'\u00a0'+r.cur+' (≈'+$$(uu(r))+')',qt=s=>s.replace(/"/g,'&quot;'),ni=t=>`<span class="ni" title="${qt(t)}">i</span>`;
+const uu=r=>r.a*D.fx(r.cur,dayOf(r.s)),amx=r=>r.cur==st.cur?$$(r.a):n0(r.a)+'\u00a0'+r.cur+' (≈'+$$(uu(r))+')',qt=s=>s.replace(/"/g,'&quot;'),ni=t=>`<span class="ni" data-ni="${qt(t)}" tabindex="0">i</span>`;
 const recent=(a,b)=>(b.open?1e15:+b.to)-(a.open?1e15:+a.to)||b.from-a.from;
 function timeline(){const C=D.C,rows=R.filter(r=>!r.p),pr=R.filter(r=>r.p),d0=dayOf(new Date(Math.floor(D.first/12),D.first%12,1)),d1=dayOf(new Date(Math.floor(D.cur/12),D.cur%12+1,0)),W=CW(),pl=100,LH=40,H=C.length*LH+28,x=d=>pl+(Math.min(Math.max(d,d0),d1)-d0)/(d1-d0)*(W-pl-8);let g='';
  for(let y=Math.floor(D.first/12)+(D.first%12?1:0);y<=Math.floor(D.cur/12);y++){const xx=x(dayOf(new Date(y,0,1)));g+=`<line x1="${xx}" x2="${xx}" y1="0" y2="${H-20}" style="stroke:var(--line)" stroke-dasharray="3 4"/><text x="${xx}" y="${H-6}" text-anchor="middle">${y}</text>`}
  C.slice().sort(recent).forEach((c,ix)=>{const cy=ix*LH+4,col=COL[c.k%6];g+=`<text x="0" y="${cy+LH/2-2}" style="font-size:12px;fill:var(--ink);font-weight:600">${c.name}</text>`;
   rows.filter(r=>r.c==c.name).forEach(r=>{const a=x(dayOf(r.s)),b=x(r.e?dayOf(r.e)+1:d1+1),w=Math.max(b-a,3);
-   g+=`<rect x="${a}" y="${cy}" width="${w}" height="${LH-14}" rx="8" fill="${col}" opacity="${r.a?1:.35}" style="stroke:var(--card)" stroke-width="1.5" data-tip="${qt(`<b>${c.name}</b><br>${dt(r.s)} — ${r.e?dt(r.e):'н.в.'}<br>${amx(r)} в мес.`)}"/>`+(w>56?`<text x="${a+w/2}" y="${cy+(LH-14)/2+4}" text-anchor="middle" style="fill:#fff;font-size:11px;font-weight:600;pointer-events:none">${n0(uu(r))} $</text>`:'')});
+   g+=`<rect x="${a}" y="${cy}" width="${w}" height="${LH-14}" rx="8" fill="${col}" opacity="${r.a?1:.35}" style="stroke:var(--card)" stroke-width="1.5" data-tip="${qt(`<b>${c.name}</b><br>${dt(r.s)} — ${r.e?dt(r.e):'н.в.'}<br>${amx(r)} в мес.`)}"/>`+(w>56?`<text x="${a+w/2}" y="${cy+(LH-14)/2+4}" text-anchor="middle" style="fill:#fff;font-size:11px;font-weight:600;pointer-events:none">${n0(uu(r))} ${sym()}</text>`:'')});
   pr.filter(r=>r.c==c.name).forEach(r=>{const xx=x(dayOf(r.pay||r.e||r.s));g+=`<path d="M${xx} ${cy-3} l7 7 l-7 7 l-7 -7z" style="fill:var(--card)" stroke="${col}" stroke-width="2.5" data-tip="${qt(`<b>Премия · ${c.name}</b><br>${amx(r)}<br>${r.e?'за '+dt(r.s)+' — '+dt(r.e):'за год до '+dt(r.s)}${r.pay?'<br>выплачена '+dt(r.pay):''}`)}"/>`})});
  return`<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`}
 function salChart(rate,real){const M=D.M,W=CW(),H=240,pl=42,pb=22,pt=10,mx=nice(Math.max(...real,...rate,1)*1.02)*4,bw=(W-pl)/M.length,y=v=>pt+(H-pt-pb)*(1-v/mx);let g='';
@@ -160,12 +167,12 @@ function career(){const M=D.M,i=st.i/100,rows=R.filter(r=>!r.p).sort((a,b)=>a.s-
   const bad=vr.filter(x=>x.g<=x.i),cum=j0>=0?cpi(D.cur)/cpi(M[j0].idx)-1:null;
   return`<div style="margin-top:16px;font-size:14px"><b class="${bad.length?'dn':'up'}">${bad.length?`Рост зарплаты обгонял инфляцию в ${vr.length-bad.length} из ${vr.length} лет, не обгонял в ${bad.map(x=>x.y).join(', ')}`:'Рост зарплаты обгонял инфляцию в каждом году'}</b>${cum!=null?`<div class="s" style="margin-top:4px">С ${mname(M[j0])} зарплата выросла на ${pct(ng)}, цены за это время на ${pct(cum)}.</div>`:''}</div>
   ${vr.map(x=>`<div class="dr" style="grid-template-columns:150px 1fr 1fr 70px"><div><b>${x.y}</b>${x.y==cy?' <span class="s">(год не закончен)</span>':''}</div><div class="s">зарплата в среднем ${pc(x.g)}</div><div class="s">инфляция ${pc(x.i)}</div><div class="r"><b class="${x.g>x.i?'up':'dn'}">${x.g>x.i?'обогнал':'отстал'}</b></div></div>`).join('')}`})();
- const html=`<h2>Карьера</h2>${B('tl',`<div class="card big"><div class="cap">Где и когда работали${ni('Блоки: периоды зарплаты ($ в месяц), ромбики: премии. Наведите курсор для деталей.')}</div>${timeline()}</div>`)}${B('stat',`<div class="grid" data-g="stat">${card('↑','Повышений в компаниях',up.length,'средний размер '+pc(av(up.map(x=>x.g))))}${card('⏱','Повышение раз в',up.length?fm(av(up.map(x=>x.mo)))+' мес.':'—','в среднем между ступенями')}${card('⇄','Смен работы',mv.length,'средний скачок '+pc(av(mv.map(x=>x.g))))}${card('★','Лучший скачок при смене',mv.length?pc(Math.max(...mv.map(x=>x.g))):'—','')}</div>`)}${B('infl',`<div class="card big"><div class="cap">Зарплата и инфляция (без премий)${ni('Розовая линия: сколько стоила бы прежняя зарплата в нынешних ценах. Если фиолетовая выше, вы обогнали инфляцию.')}</div><div class="grid" data-g="infl" style="margin:10px 0">${card('$','Зарплата сейчас',$$(now),j0>=0?'в '+mname(M[j0])+' была '+$$(rate[j0]):'')}${card('%','Рост номинальный',pc(ng),'без учёта инфляции',gc(ng))}${card('↗','Рост реальный',pc(rg),'инфляция: '+cpiSrc,gc(rg))}</div>
+ const html=`<h2>Карьера</h2>${B('tl',`<div class="card big"><div class="cap">Где и когда работали${ni('Блоки: периоды зарплаты (сумма в месяц), ромбики: премии. Наведите курсор для деталей.')}</div>${timeline()}</div>`)}${B('stat',`<div class="grid" data-g="stat">${card('↑','Повышений в компаниях',up.length,'средний размер '+pc(av(up.map(x=>x.g))))}${card('⏱','Повышение раз в',up.length?fm(av(up.map(x=>x.mo)))+' мес.':'—','в среднем между ступенями')}${card('⇄','Смен работы',mv.length,'средний скачок '+pc(av(mv.map(x=>x.g))))}${card('★','Лучший скачок при смене',mv.length?pc(Math.max(...mv.map(x=>x.g))):'—','')}</div>`)}${B('infl',`<div class="card big"><div class="cap">Зарплата и инфляция (без премий)${ni('Розовая линия: сколько стоила бы прежняя зарплата в нынешних ценах. Если фиолетовая выше, вы обогнали инфляцию.')}</div><div class="grid" data-g="infl" style="margin:10px 0">${card(sym(),'Зарплата сейчас',$$(now),j0>=0?'в '+mname(M[j0])+' была '+$$(rate[j0]):'')}${card('%','Рост номинальный',pc(ng),'без учёта инфляции',gc(ng))}${card('↗','Рост реальный',pc(rg),'инфляция: '+cpiSrc,gc(rg))}</div>
  <div class="leg" style="margin-bottom:6px"><span style="cursor:default"><i class="dot" style="background:#6c4de0"></i>зарплата, $ в месяц</span><span style="cursor:default"><i class="dot" style="background:#e4607a"></i>то же в ценах сегодняшнего дня</span></div>${salChart(rate,real)}
- ${vd}</div>`)}${B('tab',`<div class="card big"><div class="cap">Повышения и смены работы${ni('Суммы в долларах (иностранная валюта по курсу на дату начала периода). «Через» это время с предыдущей ступени.')}</div><table><tr><th>Дата</th><th>Событие</th><th>Было → стало</th><th>Изменение</th><th>Через</th></tr>${ch.slice().reverse().map(x=>`<tr><td>${dt(x.r.s)}</td><td>${x.same?(x.g>0.0001?'Повышение':x.g<-0.0001?'Снижение':'Продление')+' · '+x.r.c:x.p.c+' → '+x.r.c}</td><td>${$$(x.a)} → ${$$(x.b)}</td><td class="${gc(x.g)}">${pc(x.g)}</td><td>${x.mo} мес.</td></tr>`).join('')}</table>
+ ${vd}</div>`)}${B('tab',`<div class="card big"><div class="cap">Повышения и смены работы${ni('Суммы в выбранной валюте (другие валюты по курсу на дату начала периода). «Через» это время с предыдущей ступени.')}</div><table><tr><th>Дата</th><th>Событие</th><th>Было → стало</th><th>Изменение</th><th>Через</th></tr>${ch.slice().reverse().map(x=>`<tr><td>${dt(x.r.s)}</td><td>${x.same?(x.g>0.0001?'Повышение':x.g<-0.0001?'Снижение':'Продление')+' · '+x.r.c:x.p.c+' → '+x.r.c}</td><td>${$$(x.a)} → ${$$(x.b)}</td><td class="${gc(x.g)}">${pc(x.g)}</td><td>${x.mo} мес.</td></tr>`).join('')}</table>
  </div>`)}`;return'<h2>Карьера</h2>'+wrap('career',L)}
 const plr=(n,a)=>{const m=n%100,d=n%10;return n+' '+(m>10&&m<15?a[2]:d==1?a[0]:d>1&&d<5?a[1]:a[2])},
- expStr=mo=>{mo=Math.round(mo);const y=Math.floor(mo/12),m=mo%12;return[y?plr(y,['год','года','лет']):'',m?plr(m,['месяц','месяца','месяцев']):''].filter(Boolean).join(' и ')||'0 месяцев'};
+ expStr=mo=>{mo=Math.round(mo);if(lang=='en'){const y=Math.floor(mo/12),m=mo%12;return[y?y+' year'+(y>1?'s':''):'',m?m+' month'+(m>1?'s':''):''].filter(Boolean).join(' and ')||'0 months'}const y=Math.floor(mo/12),m=mo%12;return[y?plr(y,['год','года','лет']):'',m?plr(m,['месяц','месяца','месяцев']):''].filter(Boolean).join(' и ')||'0 месяцев'};
 function wrap(v,L){let o=[];try{o=JSON.parse(localStorage['ord_'+v]||'[]')}catch(e){}const ix=x=>{const i=o.indexOf(x.id);return i<0?99:i};L.sort((a,b)=>ix(a)-ix(b));
  return L.filter(x=>x.html).map(x=>`<div class="blk" data-b="${x.id}" data-view="${v}">${x.html}<span class="mv"><b data-mv="-1">↑</b><b data-mv="1">↓</b><i class="gr" title="Перетащить">⠿</i></span></div>`).join('')}
 const saveOrder=v=>{localStorage['ord_'+v]=JSON.stringify([...document.querySelectorAll('.blk[data-view="'+v+'"]')].map(b=>b.dataset.b))};
@@ -193,8 +200,8 @@ function yInfl(y){const P=cpiMeta.pts;if(!P)return{v:st.i/100,note:'ручная
 function cpiBlock(){const E=Math.min(D.cur,cpiMeta.last||D.cur),S=D.first,ratio=cpi(E)/cpi(S),avg=Math.pow(ratio,12/Math.max(12,E-S))-1,cy=Math.floor(D.cur/12),fy=Math.floor(S/12),rows=[];
  for(let y=cy;y>=fy;y--)rows.push({y,...yInfl(y),cum:cpi(Math.min(y*12+11,D.cur))/cpi(S)-1});
  const rec=cpiMeta.monthly?card('↻','За последние 12 мес.',pc(cpi(E)/cpi(E-12)-1),'до '+mi(E)):card('↻','Последний год с данными',pc(yInfl(Math.floor(cpiMeta.last/12)).v),'за '+lastLbl()||'');
- return`<div class="card big"><div class="cap">Инфляция США (CPI)${ni('Годовая инфляция по среднему индексу цен за год. «Оценка» значит, что официальных данных за период ещё нет и взята запасная ставка из настроек. Накопленная считается с начала вашей карьеры.')}</div>
- <div class="grid" data-g="cpi" style="margin:12px 0">${card('Ø','Средняя за карьеру',pc(avg),'в год, по данным до '+lastLbl())}${card('∑','Накопленная за карьеру',pc(ratio-1),'цены в '+n2(ratio)+' раза')}${rec}${card('◷','Свежесть данных',lastLbl(),cpiMeta.src)}</div>
+ return`<div class="card big"><div class="cap">Инфляция ${GEN[st.cur]} (CPI)${ni('Годовая инфляция по среднему индексу цен за год. «Оценка» значит, что официальных данных за период ещё нет и продлена ставка последнего известного года. Накопленная считается с начала вашей карьеры.')}</div>
+ <div class="grid" data-g="cpi" style="margin:12px 0">${card('Ø','Средняя за карьеру',pc(avg),'в год, по данным до '+lastLbl())}${card('∑','Накопленная за карьеру',pc(ratio-1),'цены ×'+n2(ratio))}${rec}${card('◷','Свежесть данных',lastLbl(),cpiMeta.src)}</div>
  <table><tr><th>Год</th><th>Инфляция за год</th><th>Накопленная с начала карьеры</th><th>Данные</th></tr>${rows.map(x=>`<tr><td><b>${x.y}</b></td><td>${pc(x.v)}</td><td>${pc(x.cum)}</td><td class="s">${x.note||'официальные'}</td></tr>`).join('')}</table></div>`}
 async function loadMarket(){const minD=dayOf(new Date(Math.floor(D.first/12),D.first%12,1));MK={...await fxArr(['USD','EUR','RUB'],minD),t:Date.now()}}
 const bnk=(c,d)=>c=='BYN'?1:MK.A[c][Math.min(Math.max(d-MK.lo,0),MK.N-1)],unitsUsd=(c,d)=>bnk('USD',d)/bnk(c,d);
@@ -204,23 +211,177 @@ function fxAvgBlock(){const today=dayOf(new Date()),CS=['BYN','EUR','RUB'],cy=ne
  for(let y=cy;y>=fy;y--)rows.push([y==cy?y+' (на сегодня)':String(y),CS.map(c=>yr(y,c)),CS.map(c=>yr(y-1,c))]);
  return`<div class="card big"><div class="cap">Курсы валют: сколько стоит 1 доллар${ni('Официальные курсы НБ РБ. Для года среднее по дням года, процент: изменение к предыдущему году. Рост числа значит, что доллар подорожал.')}</div>
  <table><tr><th>Период</th>${CS.map(c=>`<th>1 $ = ${c}</th>`).join('')}</tr>${rows.map(([n,v,p])=>`<tr><td><b>${n}</b></td>${v.map((x,i)=>`<td>${n2(x)}${p&&p[i]?` <span class="s">${pc(x/p[i]-1)}</span>`:''}</td>`).join('')}</tr>`).join('')}</table></div>`}
-function fxChgBlock(){const today=dayOf(new Date()),CS=['USD','EUR','BYN','RUB'],cy=new Date().getFullYear(),fy=Math.floor(D.first/12),
- ys=[];for(let y=cy;y>=fy;y--)ys.push(y);
- let d1,d2;if(rp=='all'){d1=MK.lo;d2=today}else if(rp=='12'){d1=today-365;d2=today}else{const y=+rp;d1=Math.max(dayOf(new Date(y,0,1))-1,MK.lo);d2=Math.min(dayOf(new Date(y,11,31)),today)}
- const v=(a,b,d)=>bnk(a,d)/bnk(b,d),seg=[['all','Вся карьера'],['12','12 месяцев'],...ys.map(y=>[String(y),String(y)])].map(([k,t])=>`<button class="${k==rp?'on':''}" data-rp="${k}">${t}</button>`).join('');
+function rpRange(){const today=dayOf(new Date()),cy=new Date().getFullYear(),fy=Math.floor(D.first/12),ys=[];for(let y=cy;y>=fy;y--)ys.push(y);let d1,d2;
+ if(rp=='all'){d1=MK.lo;d2=today}else if(rp=='12'){d1=today-365;d2=today}else{const y=+rp;d1=Math.max(dayOf(new Date(y,0,1))-1,MK.lo);d2=Math.min(dayOf(new Date(y,11,31)),today)}
+ return{d1,d2,ys}}
+function rateChart(c,d1,d2,col){const W=560,H=210,pl=50,pb=24,pt=10,n=Math.max(2,d2-d1),sp=Math.max(1,Math.floor(n/180)),P=[];
+ for(let d=d1;d<=d2;d+=sp)P.push([d,unitsUsd(c,d)]);if(P[P.length-1][0]!=d2)P.push([d2,unitsUsd(c,d2)]);
+ let mn=Math.min(...P.map(p=>p[1])),mx=Math.max(...P.map(p=>p[1]));const pad=(mx-mn||mx*.02)*.12;mn-=pad;mx+=pad;
+ const x=d=>pl+(d-d1)/(d2-d1||1)*(W-pl-8),y=v=>pt+(H-pt-pb)*(1-(v-mn)/(mx-mn)),f=v=>(v<10?v.toFixed(3):v<100?v.toFixed(2):v.toFixed(1)).replace('.',DS());let g='';
+ for(let t=0;t<=3;t++){const v=mn+(mx-mn)*t/3;g+=`<line x1="${pl}" x2="${W}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${f(v)}</text>`}
+ for(let t=0;t<=3;t++){const d=Math.round(d1+(d2-d1)*t/3),dd=new Date(d*864e5+432e5);g+=`<text x="${x(d)}" y="${H-5}" text-anchor="${t==0?'start':t==3?'end':'middle'}">${n>400?MN[dd.getMonth()]+' '+String(dd.getFullYear()).slice(2):dd.getDate()+' '+MN[dd.getMonth()]}</text>`}
+ g+=`<polyline fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round" points="${P.map(p=>x(p[0])+','+y(p[1])).join(' ')}"/>`;
+ const bw=(W-pl-8)/P.length;P.forEach(p=>{g+=`<rect data-tip="${qt(`<b>${dstr(p[0])}</b><br>1 $ = ${f(p[1])} ${c}`)}" x="${x(p[0])-bw/2}" y="0" width="${bw}" height="${H-pb}" fill="transparent"/>`});
+ return{svg:`<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`,a:P[0][1],b:P[P.length-1][1],f}}
+function fxLineBlock(){const{d1,d2,ys}=rpRange(),seg=[['all','Вся карьера'],['12','12 месяцев'],...ys.map(y=>[String(y),String(y)])].map(([k,t])=>`<button class="${k==rp?'on':''}" data-rp="${k}">${t}</button>`).join('');
+ const cs=[['BYN',COL[0]],['EUR',COL[1]],['RUB',COL[2]]].map(([c,col])=>{const r=rateChart(c,d1,d2,col);return`<div><div class="cap"><i class="dot" style="background:${col}"></i>1 $ = ${c}</div><div class="v" style="font-size:22px;margin:6px 0 0">${r.f(r.b)} <span class="s">${pc(r.b/r.a-1)}</span></div>${r.svg}</div>`}).join('');
+ return`<div class="card big"><div class="cap">Динамика курса: сколько стоит 1 доллар${ni('Официальные курсы НБ РБ: сколько единиц валюты стоит 1 доллар. Период выбирается кнопками.')}</div><div class="seg" style="margin:12px 0">${seg}</div><div class="rcs">${cs}</div></div>`}
+function fxChgBlock(){const{d1,d2}=rpRange(),CS=['USD','EUR','BYN','RUB'],v=(a,b,d)=>bnk(a,d)/bnk(b,d);
  return`<div class="card big"><div class="cap">Как менялись курсы, ${dstr(d1)} — ${dstr(d2)}${ni('Как изменилась стоимость валюты в строке, если измерять её в валюте столбца. Например, строка EUR, столбец USD: +5% значит, что евро подорожал к доллару на 5%.')}</div>
- <div class="seg" style="margin:12px 0">${seg}</div>
  <table><tr><th>Валюта</th>${CS.map(c=>`<th>к ${c}</th>`).join('')}</tr>${CS.map(a=>`<tr><td><b>${a}</b></td>${CS.map(b=>{if(a==b)return'<td class="s">—</td>';const g=v(a,b,d2)/v(a,b,d1)-1;return`<td class="${gc(g)}">${pc(g)}</td>`}).join('')}</tr>`).join('')}</table></div>`}
-function srcBlock(){const r=(n,t)=>`<div class="dr" style="grid-template-columns:170px 1fr"><div><b>${n}</b></div><div class="s" style="font-size:13px">${t}</div></div>`,tm=t=>new Date(t).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
- return`<div class="card big"><div class="cap">Откуда данные</div>${r('Таблица Google',`${R.length} строк, загружена ${loadedAt?tm(loadedAt):'—'}`)}${r('Курсы валют','НБ РБ (api.nbrb.by): USD, EUR, RUB к белорусскому рублю'+(MK?`, последний курс на ${dstr(Math.max(...Object.values(MK.lastD)))}, загружено ${tm(MK.t)}`:fxUsed?'':' (для расчётов не нужны: все суммы в USD)'))}${r('Инфляция',`${cpiMeta.src}, последние данные: ${lastLbl()}${cpiMeta.t?', обновлено '+tm(cpiMeta.t):''}`)}</div>`}
+function srcBlock(){const r=(n,t)=>`<div class="dr" style="grid-template-columns:170px 1fr"><div><b>${n}</b></div><div class="s" style="font-size:13px">${t}</div></div>`,tm=t=>new Date(t).toLocaleString(LOC(),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+ return`<div class="card big"><div class="cap">Откуда данные</div>${r('Таблица Google',`${R.length} строк, загружена ${loadedAt?tm(loadedAt):'—'}`)}${r('Курсы валют','НБ РБ (api.nbrb.by): USD, EUR, RUB к белорусскому рублю'+(MK?`, последний курс на ${dstr(Math.max(...Object.values(MK.lastD)))}, загружено ${tm(MK.t)}`:fxUsed?'':' (для расчётов не нужны: все суммы в '+st.cur+')'))}${r('Инфляция',`${cpiMeta.src}, последние данные: ${lastLbl()}${cpiMeta.t?', обновлено '+tm(cpiMeta.t):''}`)}</div>`}
 function market(){if(!MK&&!MKbusy&&!MKerr){MKbusy=true;loadMarket().then(()=>{MKbusy=false;if(view=='market')draw()}).catch(e=>{MKbusy=false;MKerr=e.message;if(view=='market')draw()})}
  const L=[],B=(id,x)=>{L.push({id,html:x});return''};
- const html=`${B('cpi',cpiBlock())}${MK?B('fxavg',fxAvgBlock())+B('fxchg',fxChgBlock()):B('fxload',`<div class="card big"><div class="cap">Курсы валют</div><div class="s" style="margin-top:10px">${MKerr||'Загружаю курсы НБ РБ…'}</div></div>`)}${B('src',srcBlock())}`;
+ const html=`${B('cpi',cpiBlock())}${MK?B('fxavg',fxAvgBlock())+B('fxline',fxLineBlock())+B('fxchg',fxChgBlock()):B('fxload',`<div class="card big"><div class="cap">Курсы валют</div><div class="s" style="margin-top:10px">${MKerr||'Загружаю курсы НБ РБ…'}</div></div>`)}${B('src',srcBlock())}`;
  return'<h2>Курсы и инфляция</h2>'+wrap('market',L)}
-function draw(){document.querySelectorAll('nav a').forEach(a=>a.className=a.dataset.v==view?'on':'');$('#main').innerHTML={home,cos,years,career,market}[view]();const p=$('#per');if(p){p.value=per;p.onchange=e=>{per=e.target.value;sel=null;draw()}}cardOrder()}
+const EN0=[
+["Сравниваются одинаковые отрезки года: например, январь–октябрь этого года с январём–октябрём прошлого. «С учётом инфляции»: доход прошлого периода пересчитан в цены текущего (в скобках разница в сумме). Инфляция:","Equal parts of the year are compared: e.g. January–October of this year with January–October of last year. “Inflation-adjusted”: the previous period's income is restated in current prices (the difference in the amount is in brackets). Inflation:"],
+["Рост считается по среднему доходу в месяц. Нулевые периоды в начале пропускаются, база: первый год с доходом. Реальный рост учитывает инфляцию. Нажмите на строку, чтобы открыть период на главной.","Growth is based on average monthly income. Zero-income periods at the start are skipped; the base is the first year with income. Real growth accounts for inflation. Click a row to open that period on the home page."],
+["Годовая инфляция по среднему индексу цен за год. «Оценка» значит, что официальных данных за период ещё нет и продлена ставка последнего известного года. Накопленная считается с начала вашей карьеры.","Annual inflation based on the average price index for the year. “Estimate” means official data is not yet available and the rate of the latest known year is carried forward. Cumulative is counted from the start of your career."],
+["Официальные курсы НБ РБ. Для года среднее по дням года, процент: изменение к предыдущему году. Рост числа значит, что доллар подорожал.","Official NBRB rates. For a year: the daily average; percentage: change vs the previous year. A higher number means the dollar got more expensive."],
+["Розовая линия: сколько стоила бы прежняя зарплата в нынешних ценах. Если фиолетовая выше, вы обогнали инфляцию.","Pink line: what your earlier salary would be worth in today's prices. If the purple line is higher, you beat inflation."],
+["Страница открыта как файл на компьютере. Браузер так не пускает к данным из интернета. Откройте сайт по адресу","The page is opened as a local file. The browser does not allow loading online data this way. Open the site at"],
+["Суммы в выбранной валюте (другие валюты по курсу на дату начала периода). «Через» это время с предыдущей ступени.","Amounts are in the selected currency (other currencies at the rate on the period start date). “After” is the time since the previous step."],
+["доход по реальным курсам минус тот же доход по курсам на начало периода. Плюс: курс помог, минус: отнял.","income at actual rates minus the same income at the rates at the start of the period. Plus: the rate helped; minus: it hurt."],
+["Как изменилась стоимость валюты в строке, если измерять её в валюте столбца. Например, строка","How the value of the row currency changed when measured in the column currency. For example, row"],
+["Сколько дохода за период пришло из премий, в целом и по каждой компании.","How much of the income for the period came from bonuses, overall and per company."],
+["Блоки: периоды зарплаты (сумма в месяц), ромбики: премии. Наведите курсор для деталей.","Blocks: salary periods (monthly amount), diamonds: bonuses. Hover for details."],
+["Браузер не смог получить таблицу (сеть, блокировщик рекламы или","The browser could not fetch the sheet (network, ad blocker, or"],
+["Для сравнения с инфляцией нужны два года с зарплатой.","Comparing with inflation needs two years with a salary."],
+["Рост зарплаты обгонял инфляцию в каждом году","Salary growth beat inflation every year"],
+["значит, что евро подорожал к доллару на 5%.","means the euro rose 5% against the dollar."],
+["Если там ошибка, лист не опубликован как","If there is an error, the sheet is not published as"],
+["Для сравнения нужен хотя бы год данных.","At least a year of data is needed for comparison."],
+["Проверьте интернет и попробуйте позже.","Check your connection and try again later."],
+["Проверьте публикацию листа и ссылку в","Check that the sheet is published and the link in"],
+["Курсы валют: сколько стоит 1 доллар","Exchange rates: what 1 dollar costs"],
+["Не удалось получить курсы НБ РБ для","Could not get NBRB rates for"],
+["Откройте ссылку на таблицу напрямую","Open the sheet link directly"],
+["для расчётов не нужны: все суммы в","not needed for calculations: all amounts in"],
+["Зарплата и инфляция (без премий)","Salary and inflation (excluding bonuses)"],
+["Рост зарплаты обгонял инфляцию в","Salary growth beat inflation in"],
+["должен скачаться или показаться","should download or show"],
+["Нет дохода за выбранный период","No income for the selected period"],
+["по курсам НБ РБ на каждую дату","at NBRB rates for each date"],
+["то же в ценах сегодняшнего дня","same in today's prices"],
+["Накопленная с начала карьеры","Cumulative since career start"],
+["Не удалось загрузить данные.","Failed to load data."],
+["При курсах на начало периода","At rates from period start"],
+["в среднем между ступенями","average between steps"],
+["если бы курсы не менялись","if rates had not changed"],
+["Повышения и смены работы","Raises and job changes"],
+["премий за период не было","no bonuses in the period"],
+["Лучший скачок при смене","Best jump on job change"],
+["Последний год с данными","Latest year with data"],
+["Сбросить порядок блоков","Reset block order"],
+["Средний рост год к году","Average year-over-year growth"],
+["Таблица недоступна (код","Sheet unavailable (code"],
+["за последние 12 месяцев","for the last 12 months"],
+["Инфляция (запасная), %","Inflation (fallback), %"],
+["Накопленная за карьеру","Cumulative over career"],
+["Реальный рост, 12 мес.","Real growth, 12 mo."],
+["Влияние курсов валют,","Impact of exchange rates,"],
+["Доля премий в доходе,","Bonus share of income,"],
+["Максимальная зарплата","Highest salary"],
+["Повышений в компаниях","Raises within companies"],
+["Принесла больше всего","Earned the most"],
+["Вся карьера, среднее","Whole career, average"],
+["Где и когда работали","Where and when you worked"],
+["За последние 12 мес.","Last 12 mo."],
+["Загружаю курсы НБ РБ","Loading NBRB rates"],
+["Зарплата по периодам","Salary by period"],
+["к белорусскому рублю","to the Belarusian ruble"],
+["цены за это время на","prices over the same time by"],
+["Как менялись курсы,","How rates changed,"],
+["Реальный рост в год","Real growth per year"],
+["в год, по данным до","per year, data up to"],
+["зарплата выросла на","salary grew by"],
+["Курсы НБ РБ, всё в","NBRB rates, everything in"],
+["Средняя за карьеру","Career average"],
+["без учёта инфляции","excluding inflation"],
+["зарплата в среднем","salary on average"],
+["Последние 12 мес.","Last 12 mo."],
+["С учётом инфляции","Inflation-adjusted"],
+["Самый долгий стаж","Longest tenure"],
+["лет, не обгонял в","years, did not beat it in"],
+["последние данные:","latest data:"],
+["последний курс на","latest rate on"],
+["Доход по месяцам","Income by month"],
+["Доход фактически","Actual income"],
+["Курсы и инфляция","Rates & inflation"],
+["Рост номинальный","Nominal growth"],
+["в ценах сегодня:","in today's prices:"],
+["год не закончен)","year not finished)"],
+["премии (светлее)","bonuses (lighter)"],
+["строк, загружена","rows, loaded"],
+["Вклад компаний,","Contribution by company,"],
+["Загружаю данные","Loading data"],
+["Зарплата сейчас","Salary now"],
+["Инфляция за год","Inflation per year"],
+["Повышение раз в","A raise every"],
+["Свежесть данных","Data freshness"],
+["в месяц, ставка","per month, rate"],
+["за год до даты)","for the year before the date)"],
+["Вклад компаний","Contribution by company"],
+["Инфляция США (","US inflation ("],
+["Премий не было","No bonuses"],
+["средний размер","average size"],
+["средний скачок","average jump"],
+["Откуда данные","Data sources"],
+["Рекорд месяца","Best month"],
+["Рост реальный","Real growth"],
+["Часов в месяц","Hours per month"],
+["Эффект курсов","Exchange rate effect"],
+["в т.ч. премии","incl. bonuses"],
+["из них премии","of which bonuses"],
+["из них премия","of which bonus"],
+["пред. 12 мес.","prev. 12 mo."],
+["ручная ставка","manual rate"],
+["тот же период","same period"],
+["Дней в месяц","Days per month"],
+["Изменение, %","Change, %"],
+["за всё время","all time"],
+["Вся карьера","Whole career"],
+["Доля дохода","Share of income"],
+["Доля премий","Bonus share"],
+["Курсы валют","Exchange rates"],
+["Рост дохода","Income growth"],
+["Смен работы","Job changes"],
+["Сравнение с","Compared with"],
+["мес. подряд","mo. in a row"],
+["мес. работы","mo. worked"],
+["на сегодня)","to date)"],
+["номинально:","nominal:"],
+["официальные","official"],
+["Заработано","Earned"],["Лучший год","Best year"],["Общий стаж","Total experience"],["Перетащить","Drag"],["без премий","excluding bonuses"],["нет данных","no data"],["номинально","nominal"],["Всё время","All time"],["Изменение","Change"],["Инфляция:","Inflation:"],["Настройки","Settings"],["Обновлено","Updated"],["Повышение","Raise"],["Продление","Renewal"],["выплачена","paid"],["данные до","data up to"],["за год до","for the year before"],["загружено","loaded"],["зарплата,","salary,"],["зарплата:","salary:"],["инфляция:","inflation:"],["обновлено","updated"],["помесячно","monthly"],["укрепился","strengthened"],["Зарплата","Salary"],["Инфляция","Inflation"],["Компании","Companies"],["Пред. 12","Prev. 12"],["Реальный","Real"],["Снижение","Decrease"],["зарплата","salary"],["инфляция","inflation"],["к доходу","of income"],["по годам","by year"],["В месяц","Per month"],["Главная","Home"],["Карьера","Career"],["Месяцев","Months"],["НБ РБ (","NBRB ("],["Сегодня","Today"],["Событие","Event"],["Таблица","Sheet"],["в месяц","per month"],["месяцев","months"],["обогнал","beat"],["сейчас:","now:"],["столбец","column"],["В день","Per day"],["Валюта","Currency"],["Данные","Data"],["Период","Period"],["Премии","Bonuses"],["Премия","Bonus"],["Сейчас","Now"],["Эффект","Effect"],["в день","per day"],["в мес.","per mo."],["дохода","of income"],["месяца","months"],["отстал","lagged"],["оценка","estimate"],["премии","bonuses"],["премия","bonus"],["В час","Per hour"],["Всего","Total"],["Доход","Income"],["Обзор","Overview"],["Через","After"],["в год","per year"],["в час","per hour"],["всего","total"],["мес.:","mo.:"],["месяц","month"],["ослаб","weakened"],["стало","now"],["Было","Was"],["Годы","Years"],["Дата","Date"],["Мес.","Mo."],["Рост","Growth"],["Тема","Theme"],["была","was"],["года","years"],["мес.","mo."],["н.в.","present"],["раза","times"],["Год","Year"],["США","US"],["год","year"],["лет","years"],["до","to"],["за","for"],["из","of"],["на","on"],["с","since"],["к","vs"],
+["ч","h"],["предыдущим","previous"],["в","in"],["С","Since"],["цены","prices"],["Еврозона","Euro area"],["Беларусь","Belarus"],["Россия","Russia"],["еврозоны","euro area"],["Беларуси","Belarus"],["России","Russia"],["Инфляция США (CPI)","US inflation (CPI)"],["Инфляция еврозоны (CPI)","Euro area inflation (CPI)"],["Инфляция Беларуси (CPI)","Belarus inflation (CPI)"],["Инфляция России (CPI)","Russia inflation (CPI)"],
+["«Среднегодовой рост» — единый годовой процент, при котором за те же годы получился бы такой же итог (сложный процент).","“Average annual growth” is the single yearly percentage that would give the same total over the same years (compound growth)."],["Среднегодовой рост","Average annual growth"],
+["Динамика курса: сколько стоит 1 доллар","Rate dynamics: what 1 dollar costs"],["Официальные курсы НБ РБ: сколько единиц валюты стоит 1 доллар. Период выбирается кнопками.","Official NBRB rates: how many units of the currency 1 dollar costs. Choose the period with the buttons."],
+["Строка","Row"],["в таблице: проверьте даты (дд.мм.гггг) и сумму","in the sheet: check the dates (dd.mm.yyyy) and the amount"],["неизвестная валюта","unknown currency"],["Допустимо","Allowed"],["В таблице нет данных","The sheet has no data"],["Выберите","Choose"]
+],ENRX=[[/за (\d{4}) год(?![А-Яа-яЁё])/g,'for $1'],[/(\d{4}) год(?![А-Яа-яЁё])/g,'$1']],
+ENRE=EN0.slice().sort((a,b)=>b[0].length-a[0].length).map(([k,v])=>[new RegExp('(?<![А-Яа-яЁё])'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![А-Яа-яЁё])','g'),v]),
+T=s=>lang=='en'?ENRE.reduce((a,[r,v])=>a.replace(r,v),ENRX.reduce((a,[r,v])=>a.replace(r,v),s)):s,
+MNr=MN.slice(),MNe=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let updTime=null;
+const pop=$('#pop');let popFor=null;
+function showPop(el,pin){pop.textContent=el.dataset.ni;pop.style.display='block';const r=el.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight,x=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8);let y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);pop.style.left=x+'px';pop.style.top=y+'px';popFor=pin?el:null}
+const hidePop=()=>{pop.style.display='none';popFor=null};
+document.addEventListener('click',e=>{const n=e.target.closest&&e.target.closest('[data-ni]');if(n){popFor===n?hidePop():showPop(n,true)}else hidePop()});
+document.addEventListener('mouseover',e=>{const n=e.target.closest&&e.target.closest('[data-ni]');if(n&&!popFor)showPop(n,false)});
+document.addEventListener('mouseout',e=>{const n=e.target.closest&&e.target.closest('[data-ni]');if(n&&!popFor)hidePop()});
+document.addEventListener('keydown',e=>{if(e.key=='Escape')hidePop()});
+if(typeof window!='undefined')addEventListener('scroll',hidePop,true);
+function draw(){hidePop();document.querySelectorAll('nav a').forEach(a=>a.className=a.dataset.v==view?'on':'');if(!D){$('#main').innerHTML='<div class="card">'+T('Загружаю данные')+'…</div>';return}$('#main').innerHTML=T({home,cos,years,career,market}[view]());const p=$('#per');if(p){p.value=per;p.onchange=e=>{per=e.target.value;sel=null;draw()}}cardOrder()}
 const tip=$('#tip'),th=$('#th');
 function setTheme(t){document.documentElement.dataset.theme=t;localStorage.theme=t;th.textContent=t=='dark'?'☀':'☾';document.querySelector('meta[name=theme-color]').content=t=='dark'?'#0e0f14':'#f3f4f8'}
 th.onclick=()=>setTheme(document.documentElement.dataset.theme=='dark'?'light':'dark');setTheme(document.documentElement.dataset.theme||'light');
+const lg=$('#lg'),cs=$('#cur');
+function trStatic(){if(typeof NodeFilter=='undefined')return;const w=document.createTreeWalker(document.querySelector('aside'),NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(n.parentNode.id=='upd'||!n.nodeValue.trim())continue;if(n.__ru==null)n.__ru=n.nodeValue;n.nodeValue=T(n.__ru)}}
+function setUpd(){if(!updTime)return;$('#upd').textContent=T('Обновлено')+' '+updTime;{const tx=(fxUsed?T('Курсы НБ РБ, всё в')+' '+st.cur+'. ':'')+T('Инфляция:')+' '+T(cpiSrc),e0=$('#upd');if(e0.dataset)e0.dataset.ni=tx;else e0.title=tx}}
+function applyLang(){MN.splice(0,12,...(lang=='en'?MNe:MNr));lg.textContent=lang=='en'?'RU':'EN';document.documentElement.lang=lang;trStatic();setUpd();draw()}
+lg.onclick=()=>{lang=lang=='en'?'ru':'en';localStorage.lang=lang;applyLang()};
+cs.value=st.cur;cs.onchange=async()=>{st.cur=cs.value;localStorage.cur=st.cur;if(!R)return;try{fx=await getFx(R)}catch(e){fx=()=>1}try{await loadCpi()}catch(e){}calc();draw();setUpd()};
 document.addEventListener('click',e=>{const t=e.target,k=t.closest('[data-k]'),y=t.closest('[data-y]'),co=t.closest('[data-co]'),pb=t.closest('[data-p]'),rb=t.closest('[data-rp]');
  if(rb){rp=rb.dataset.rp;draw()}
  else if(pb){per=pb.dataset.p;sel=null;draw()}
@@ -233,6 +394,6 @@ async function load(){try{
  if(location.protocol=='file:')throw new Error('Страница открыта как файл на компьютере. Браузер так не пускает к данным из интернета. Откройте сайт по адресу GitHub Pages (https://...github.io/...).');
  let r;try{r=await fetch(CFG.csv,{cache:'no-store'})}catch(e){throw new Error('Браузер не смог получить таблицу (сеть, блокировщик рекламы или Google отклонил запрос). <a href="'+CFG.csv+'" target="_blank">Откройте ссылку на таблицу напрямую</a>: должен скачаться или показаться CSV. Если там ошибка, лист не опубликован как CSV.')}
  if(!r.ok)throw new Error('Таблица недоступна (код '+r.status+'). Проверьте публикацию листа и ссылку в config.js');
- R=Calc.rows(await r.text());loadedAt=new Date();fx=await getFx(R);try{await loadCpi()}catch(e){}calc();$('#upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});$('#upd').title=(fxUsed?'Курсы НБ РБ, всё в USD. ':'')+'Инфляция: '+cpiSrc;draw()}catch(e){$('#main').innerHTML=`<div class="err"><b>Не удалось загрузить данные.</b><br>${e.message}</div>`}}
-load();
+ R=Calc.rows(await r.text());loadedAt=new Date();fx=await getFx(R);try{await loadCpi()}catch(e){}calc();updTime=new Date().toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'});setUpd();draw()}catch(e){$('#main').innerHTML=T(`<div class="err"><b>Не удалось загрузить данные.</b><br>${e.message}</div>`)}}
+applyLang();load();
 </script></body></html>
