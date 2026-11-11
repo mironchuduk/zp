@@ -15,18 +15,18 @@ function compute(R,o){
  const now=o.now||new Date(),cur=ms(now),H=o.hours,I=o.infl,fx=o.fx||(()=>1),cp=o.cpi||(i=>Math.pow(1+I,i/12)),rl=(g,a,b)=>g==null?null:(1+g)/(cp(b)/cp(a))-1;
  const cos=[...new Set(R.map(r=>r.c))],first=Math.min(...R.map(r=>ms(r.s))),n=cur-first+1,K=cos.length;
  const U=(y,m,d)=>Date.UTC(y,m,d)/864e5,UD=d=>U(d.getFullYear(),d.getMonth(),d.getDate());
- const fd=U(Math.floor(first/12),first%12,1),ed=U(Math.floor(cur/12),cur%12+1,0),T=ed-fd+1;
+ const fd=U(Math.floor(first/12),first%12,1),ed=U(Math.floor(cur/12),cur%12+1,0),T=ed-fd+1,td=Math.min(UD(now),ed),dtot=new Float64Array(T);
  const md=[],dm=new Int32Array(T);let off=0;
  for(let i=0;i<n;i++){const idx=first+i,dim=new Date(Date.UTC(Math.floor(idx/12),idx%12+1,0)).getUTCDate();md.push(dim);for(let j=0;j<dim;j++)dm[off+j]=i;off+=dim}
  const cv=cos.map(()=>new Uint8Array(T)),sal=cos.map(()=>Array(n).fill(0)),pr=cos.map(()=>Array(n).fill(0));
  // зарплата: пропорционально дням месяца, в которые человек числился в компании
- R.forEach(r=>{if(r.p)return;const k=cos.indexOf(r.c),a=Math.max(UD(r.s),fd),b=Math.min(r.e?UD(r.e):ed,ed);for(let d=a;d<=b;d++){cv[k][d-fd]=1;const i=dm[d-fd];sal[k][i]+=r.a*fx(r.cur,d)/md[i]}});
+ R.forEach(r=>{if(r.p)return;const k=cos.indexOf(r.c),a=Math.max(UD(r.s),fd),b=Math.min(r.e?UD(r.e):td,td);for(let d=a;d<=b;d++){cv[k][d-fd]=1;const i=dm[d-fd],v=r.a*fx(r.cur,d)/md[i];sal[k][i]+=v;dtot[d-fd]+=v}});
  // премия: если указан период (Начало и Конец), делится по дням работы в этой компании внутри периода;
  // если конца нет, как раньше: год до даты в «Начало»
  R.forEach(r=>{if(!r.p)return;const k=cos.indexOf(r.c),P=UD(r.s),hasP=!!r.e,amt=r.a*fx(r.cur,r.pay?UD(r.pay):hasP?UD(r.e):P);if(!hasP&&P>ed)return;
   const a0=hasP?P:U(r.s.getFullYear()-1,r.s.getMonth(),r.s.getDate()+1),b0=hasP?UD(r.e):P,lo=Math.max(a0,fd),hi=Math.min(b0,ed);let N=0;
   for(let d=lo;d<=hi;d++)N+=cv[k][d-fd];
-  if(N){for(let d=lo;d<=hi;d++)if(cv[k][d-fd])pr[k][dm[d-fd]]+=amt/N}else pr[k][dm[Math.min(Math.max(b0,fd),ed)-fd]]+=amt});
+  if(N){for(let d=lo;d<=hi;d++)if(cv[k][d-fd]){pr[k][dm[d-fd]]+=amt/N;dtot[d-fd]+=amt/N}}else{const q=Math.min(Math.max(b0,fd),ed);pr[k][dm[q-fd]]+=amt;dtot[q-fd]+=amt}});
  const f=cos.map(()=>Array(n).fill(0)),an=Array(n).fill(0);
  for(let d=0;d<T;d++){let a=0;for(let k=0;k<K;k++)if(cv[k][d]){f[k][dm[d]]++;a=1}an[dm[d]]+=a}
  for(let i=0;i<n;i++){an[i]/=md[i];for(let k=0;k<K;k++)f[k][i]/=md[i]}
@@ -46,7 +46,7 @@ function compute(R,o){
  C.forEach(c=>{c.ay=c.am*12;c.hr=c.am/H});
  const today=UD(now),act=R.filter(r=>!r.p&&UD(r.s)<=today&&(!r.e||UD(r.e)>=today)),salNow=sum(act.map(r=>r.a*fx(r.cur,today))),nAct=new Set(act.map(r=>r.c)).size;
  const rec=M.reduce((a,m)=>m.tot>a.tot?m:a,M[0]);
- return{fx,M,C,first,cur,l12,p12,all,ys,base,cagr,cagrR:base&&N>0&&cagr!=null?Math.pow((last.am/base.am)/(cp(last.y*12+5)/cp(base.y*12+5)),1/N)-1:null,avgG:avg(gg),avgR:avg(rr),
+ return{fx,M,C,first,cur,daySum:(a,b)=>{let s=0;for(let d=Math.max(a,fd);d<=Math.min(b,ed);d++)s+=dtot[d-fd];return s},l12,p12,all,ys,base,cagr,cagrR:base&&N>0&&cagr!=null?Math.pow((last.am/base.am)/(cp(last.y*12+5)/cp(base.y*12+5)),1/N)-1:null,avgG:avg(gg),avgR:avg(rr),
   salNow,rateNow:nAct?salNow/(nAct*H):null,rec,longest:C.reduce((a,c)=>c.mo>a.mo?c:a,C[0])}}
 const api={rows,compute};if(typeof module!='undefined')module.exports=api;else root.Calc=api;
 })(this);

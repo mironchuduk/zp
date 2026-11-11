@@ -77,7 +77,7 @@ let cpi=i=>Math.pow(1+st.i/100,i/12),cpiSrc='ручная ставка',cpiMeta=
 function mkCpi(p,tail){p.sort((a,b)=>a[0]-b[0]);const f=p[0],l=p[p.length-1],g=()=>1+(tail!=null?tail:st.i/100);
  return i=>{if(i<=f[0])return f[1]/Math.pow(g(),(f[0]-i)/12);if(i>=l[0])return l[1]*Math.pow(g(),(i-l[0])/12);let k=0;while(p[k+1][0]<i)k++;const a=p[k],b=p[k+1];return a[1]*Math.pow(b[1]/a[1],(i-a[0])/(b[0]-a[0]))}}
 async function fredCpi(){const r=await fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL&cosd=2015-01-01');if(!r.ok)throw 0;const p=(await r.text()).trim().split('\n').slice(1).map(l=>l.split(',')).map(([d,v])=>[+d.slice(0,4)*12+(+d.slice(5,7)-1),parseFloat(v)]).filter(x=>x[1]>0);if(p.length<12)throw 0;return p}
-async function blsCpi(){const y=new Date().getFullYear(),r=await fetch(`https://api.bls.gov/publicAPI/v1/timeseries/data/CUUR0000SA0?startyear=${y-9}&endyear=${y}`);if(!r.ok)throw 0;const d=(await r.json()).Results.series[0].data,p=d.filter(x=>/^M(0[1-9]|1[0-2])$/.test(x.period)).map(x=>[+x.year*12+(+x.period.slice(1)-1),parseFloat(x.value)]);if(p.length<12)throw 0;return p}
+async function blsCpi(){const y=new Date().getFullYear(),r=await fetch(`https://api.bls.gov/publicAPI/v1/timeseries/data/CUUR0000SA0?startyear=${y-9}&endyear=${y}`);if(!r.ok)throw 0;const d=(await r.json()).Results.series[0].data,p=d.filter(x=>/^M(0[1-9]|1[0-2])$/.test(x.period)).map(x=>[+x.year*12+(+x.period.slice(1)-1),parseFloat(x.value)]).filter(x=>x[1]>0);if(p.length<12)throw 0;return p}
 async function wbCpi(cc){const r=await fetch('https://api.worldbank.org/v2/country/'+cc+'/indicator/FP.CPI.TOTL.ZG?format=json&per_page=100&date=2010:'+new Date().getFullYear());if(!r.ok)throw 0;const j=(await r.json())[1].filter(x=>x.value!=null).map(x=>[+x.date,x.value]).sort((a,b)=>a[0]-b[0]);if(!j.length)throw 0;let q=1;const p=[[(j[0][0]-1)*12+6,1]];j.forEach(([y,v])=>{q*=1+v/100;p.push([y*12+6,q])});return p}
 const GEN={USD:'США',EUR:'еврозоны',BYN:'Беларуси',RUB:'России'},CN={USD:'США',EUR:'Еврозона',BYN:'Беларусь',RUB:'Россия'},WBC={USD:'USA',EUR:'EMU',BYN:'BLR',RUB:'RUS'};
 async function loadCpi(){const c0=st.cur,KEY='cpi3_'+c0;let c;try{c=JSON.parse(localStorage[KEY])}catch(e){}
@@ -85,6 +85,7 @@ async function loadCpi(){const c0=st.cur,KEY='cpi3_'+c0;let c;try{c=JSON.parse(l
   if(c0=='USD'){try{n={pts:await fredCpi(),src:'США CPI (FRED), помесячно'}}catch(e){try{n={pts:await blsCpi(),src:'США CPI (BLS), помесячно'}}catch(e1){}}}
   if(!n){try{n={pts:await wbCpi(WBC[c0]),src:CN[c0]+' CPI (World Bank), по годам'}}catch(e2){}}
   if(n){c={t:Date.now(),...n};localStorage[KEY]=JSON.stringify(c)}}
+ if(c&&c.pts)c.pts=c.pts.filter(p=>Number.isFinite(p[1])&&p[1]>0);
  if(c&&c.pts&&c.pts.length>1){const monthly=/помесячно/.test(c.src),P=c.pts.slice().sort((x,y)=>x[0]-y[0]),L=P[P.length-1],pv=monthly?P.find(p=>p[0]==L[0]-12):P[P.length-2],tail=pv&&pv[1]>0?L[1]/pv[1]-1:null;
   cpi=mkCpi(P,tail);cpiSrc=c.src;cpiMeta={src:c.src,t:c.t,monthly,pts:c.pts,last:L[0],tail}}
  else{cpi=i=>Math.pow(1+st.i/100,i/12);cpiSrc='ручная ставка '+st.i+'%';cpiMeta={src:'ручная ставка',monthly:false}}}
@@ -119,11 +120,12 @@ function premBlock(ms){const T=ms.reduce((a,m)=>a+m.tot,0),P=ms.reduce((a,m)=>a+
  return`<div class="card big"><div class="cap">Доля премий в доходе, ${plab()}${ni('Сколько дохода за период пришло из премий, в целом и по каждой компании.')}</div>
  <div class="pm"><div><div class="big2">${pct(P/T)}</div><div class="s">${P>0?$$(P)+' из '+$$(T):'премий за период не было'}</div></div><div>${bar(P,T,16)}<div class="leg" style="margin-top:10px"><span style="cursor:default"><i class="dot" style="background:var(--ac)"></i>зарплата ${$$(T-P)}</span><span style="cursor:default"><i class="dot" style="background:#e4607a"></i>премии ${$$(P)}</span></div></div></div>
  ${C.map(x=>`<div class="dr" style="grid-template-columns:150px 1fr 190px"><div><i class="dot" style="background:${COL[x.c.k%6]}"></i><b>${x.c.name}</b></div>${bar(x.p,x.t,8)}<div class="r"><b>${pct(x.p/x.t)}</b><small>${$$(x.p)} из ${$$(x.t)}</small></div></div>`).join('')}</div>`}
-function growthBlock(){const M=D.M,cur=D.cur,cy=Math.floor(cur/12),sg=x=>(x>0?'+':'')+$$(x),S=(a,b)=>M.filter(m=>m.idx>=a&&m.idx<=b).reduce((s,m)=>s+m.tot,0),
- cmp=(lab,pl,a,b,a0,b0)=>{const c=S(a,b),p=S(a0,b0);if(!(p>0))return null;const g=c/p-1,r=cpi((a+b)/2)/cpi((a0+b0)/2);return{lab,pl,c,p,d:c-p,g,rg:(1+g)/r-1,dr:c-p*r}},
- pr=cur%12==0?MN[0]:MN[0]+'–'+MN[cur%12],
- rows=[cmp('Последние 12 мес.','пред. 12 мес.',cur-11,cur,cur-23,cur-12),cmp(`${cy} (${pr})`,`${cy-1} (${pr})`,cy*12,cur,(cy-1)*12,cur-12)];
- for(let y=cy-1;y>Math.floor(D.first/12);y--)rows.push(cmp(String(y),String(y-1),y*12,y*12+11,(y-1)*12,(y-1)*12+11));
+function growthBlock(){const t=new Date(),cy=t.getFullYear(),tm=t.getMonth(),td=t.getDate(),sg=x=>(x>0?'+':'')+$$(x),dn=(y,m,d)=>Date.UTC(y,m,d)/864e5,
+ mid=(a,b)=>{const x=new Date((a+b)/2*864e5);return x.getUTCFullYear()*12+x.getUTCMonth()+(x.getUTCDate()-1)/30.4},
+ cmp=(lab,pl,a,b,a0,b0)=>{const c=D.daySum(a,b),p=D.daySum(a0,b0);if(!(p>0))return null;const g=c/p-1,r=cpi(mid(a,b))/cpi(mid(a0,b0));return{lab,pl,c,p,d:c-p,g,rg:(1+g)/r-1,dr:c-p*r}},
+ today=dn(cy,tm,td),pr=`${td} ${MN[tm]}`,
+ rows=[cmp('Последние 12 мес.','пред. 12 мес.',dn(cy,tm-12,td)+1,today,dn(cy,tm-24,td)+1,dn(cy,tm-12,td)),cmp(`${cy} (1 ${MN[0]} – ${pr})`,`${cy-1} (1 ${MN[0]} – ${pr})`,dn(cy,0,1),today,dn(cy-1,0,1),dn(cy-1,tm,td))];
+ for(let y=cy-1;y>Math.floor(D.first/12);y--)rows.push(cmp(String(y),String(y-1),dn(y,0,1),dn(y,11,31),dn(y-1,0,1),dn(y-1,11,31)));
  const R2=rows.filter(Boolean),ytd=R2.find(x=>x.lab.startsWith(cy+' ')),l=D.l12;
  return`<div class="card big"><div class="cap">Рост дохода${ni('Сравниваются одинаковые отрезки года: например, январь–октябрь этого года с январём–октябрём прошлого. «С учётом инфляции»: доход прошлого периода пересчитан в цены текущего (в скобках разница в сумме). Инфляция: '+cpiSrc+' «Среднегодовой рост» — единый годовой процент, при котором за те же годы получился бы такой же итог (сложный процент).')}</div>
  <div class="grid" data-g="growth" style="margin:12px 0">${card('%','Реальный рост, 12 мес.',pc(l.r),'номинально '+pc(l.g),gc(l.r))}${card('↗','Среднегодовой рост',pc(D.cagrR),'номинально '+pc(D.cagr),gc(D.cagrR))}${ytd?card('△',`${cy} к ${cy-1}, тот же период`,pc(ytd.rg),sg(ytd.d)+' · номинально '+pc(ytd.g),gc(ytd.rg)):''}</div>
@@ -163,7 +165,7 @@ function salChart(rate,real){const M=D.M,W=CW(),H=240,pl=42,pb=22,pt=10,mx=nice(
  M.forEach((m,j)=>{if(m.idx%12==0)g+=`<text x="${pl+j*bw}" y="${H-5}" text-anchor="middle">${Math.floor(m.idx/12)}</text>`;
   g+=`<rect data-tip="${qt(`<b>${mname(m)}</b><br>зарплата: ${$$(rate[j])}<br>в ценах сегодня: ${$$(real[j])}`)}" x="${pl+j*bw}" y="0" width="${bw}" height="${H-pb}" fill="transparent"/>`});
  return`<svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`}
-function career(){const M=D.M,i=st.i/100,rows=R.filter(r=>!r.p).sort((a,b)=>a.s-b.s),rate=M.map(m=>m.any>0?m.salT/m.any:0),real=M.map((m,j)=>rate[j]*cpi(D.cur)/cpi(m.idx)),j0=rate.findIndex(v=>v>0),now=D.salNow;
+function career(){const M=D.M,i=st.i/100,rows=R.filter(r=>!r.p).sort((a,b)=>a.s-b.s),rate=M.map(m=>m.any>0?m.salT/m.any:0),real=M.map((m,j)=>{const v=rate[j]*cpi(D.cur)/cpi(m.idx);return Number.isFinite(v)?v:rate[j]}),j0=rate.findIndex(v=>v>0),now=D.salNow;
  const ch=[];rows.forEach((r,j)=>{if(!j)return;const p=rows[j-1],a=uu(p),b=uu(r);ch.push({r,p,same:p.c==r.c,g:a>0?b/a-1:null,a,b,mo:(r.s.getFullYear()-p.s.getFullYear())*12+r.s.getMonth()-p.s.getMonth()})});
  const up=ch.filter(x=>x.same&&x.g>0.0001),mv=ch.filter(x=>!x.same&&x.g!=null),av=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
  const ng0=0;const ng=j0>=0?now/rate[j0]-1:null,rg=j0>=0?now/real[j0]-1:null;
