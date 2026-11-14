@@ -46,7 +46,7 @@ function compute(R,o){
  C.forEach(c=>{c.ay=c.am*12;c.hr=c.am/H});
  const today=UD(now),act=R.filter(r=>!r.p&&UD(r.s)<=today&&(!r.e||UD(r.e)>=today)),salNow=sum(act.map(r=>r.a*fx(r.cur,today))),nAct=new Set(act.map(r=>r.c)).size;
  const rec=M.reduce((a,m)=>m.tot>a.tot?m:a,M[0]);
- return{fx,M,C,first,cur,daySum:(a,b)=>{let s=0;for(let d=Math.max(a,fd);d<=Math.min(b,ed);d++)s+=dtot[d-fd];return s},l12,p12,all,ys,base,cagr,cagrR:base&&N>0&&cagr!=null?Math.pow((last.am/base.am)/(cp(last.y*12+5)/cp(base.y*12+5)),1/N)-1:null,avgG:avg(gg),avgR:avg(rr),
+ return{fx,f,M,C,first,cur,daySum:(a,b)=>{let s=0;for(let d=Math.max(a,fd);d<=Math.min(b,ed);d++)s+=dtot[d-fd];return s},l12,p12,all,ys,base,cagr,cagrR:base&&N>0&&cagr!=null?Math.pow((last.am/base.am)/(cp(last.y*12+5)/cp(base.y*12+5)),1/N)-1:null,avgG:avg(gg),avgR:avg(rr),
   salNow,rateNow:nAct?salNow/(nAct*H):null,rec,longest:C.reduce((a,c)=>c.mo>a.mo?c:a,C[0])}}
 const api={rows,compute};if(typeof module!='undefined')module.exports=api;else root.Calc=api;
 })(this);
